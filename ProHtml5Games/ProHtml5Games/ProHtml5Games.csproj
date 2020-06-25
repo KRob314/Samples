@@ -67,6 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Ch3.html" />
     <Content Include="Content\styles.css" />
     <Content Include="Global.asax" />
     <Content Include="Images\backgrounds\clouds-background.png" />
@@ -101,6 +102,9 @@
     <Content Include="Images\slingshot.png" />
     <Content Include="Images\splashscreen.png" />
     <Content Include="Main.html" />
+    <Content Include="Scripts\Box2d-demo.js" />
+    <Content Include="Scripts\Box2d.js" />
+    <Content Include="Scripts\Box2d.min.js" />
     <Content Include="Scripts\game.js" />
     <Content Include="Web.config" />
   </ItemGroup>
