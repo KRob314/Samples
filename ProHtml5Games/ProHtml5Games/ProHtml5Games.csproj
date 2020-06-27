@@ -67,6 +67,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Audio\bounce.mp3" />
+    <Content Include="Audio\bounce.ogg" />
+    <Content Include="Audio\glassbreak.mp3" />
+    <Content Include="Audio\glassbreak.ogg" />
+    <Content Include="Audio\gurdonark-kindergarten.mp3" />
+    <Content Include="Audio\gurdonark-kindergarten.ogg" />
+    <Content Include="Audio\released.mp3" />
+    <Content Include="Audio\released.ogg" />
+    <Content Include="Audio\woodbreak.mp3" />
+    <Content Include="Audio\woodbreak.ogg" />
     <Content Include="Ch3.html" />
     <Content Include="Content\styles.css" />
     <Content Include="Global.asax" />
