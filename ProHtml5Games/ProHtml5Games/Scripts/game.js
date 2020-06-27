@@ -22,9 +22,12 @@ var game = {
         loader.init();
         mouse.init();
 
-        // Hide all game layers and display the start screen
-        game.hideScreens();
-        game.showScreen("gamestartscreen");
+        game.loadSounds(function ()
+        {
+            // Hide all game layers and display the start screen
+            game.hideScreens();
+            game.showScreen("gamestartscreen");
+        });
     },
 
     hideScreens: function() {
@@ -89,6 +92,8 @@ var game = {
         game.ended = false;
 
         game.animationFrame = window.requestAnimationFrame(game.animate, game.canvas);
+
+        game.startBackgroundMusic();
 
     },
 
@@ -257,7 +262,7 @@ var game = {
                 game.currentHero.SetAngularDamping(2);
 
                 // Play the slingshot released sound
-                //game.slingshotReleasedSound.play();
+                game.slingshotReleasedSound.play();
             }
         }
 
@@ -359,6 +364,8 @@ var game = {
         // Handle panning, game states and control flow
         game.handleGameLogic();
 
+        game.removeDeadBodies();
+
         // Draw the background with parallax scrolling
         // First draw the background image, offset by a fraction of the offsetLeft distance (1/4)
         // The bigger the fraction, the closer the background appears to be
@@ -372,6 +379,9 @@ var game = {
 
         //draw bodies
         game.drawAllBodies();
+
+        if (game.mode === "firing")
+            game.drawSlingshotBand();
 
         // Draw the front of the slingshot, offset by the entire offsetLeft distance
         game.context.drawImage(game.slingshotFrontImage, game.slingshotX - game.offsetLeft, game.slingshotY);
@@ -444,6 +454,125 @@ var game = {
         }
 
         game.showScreen("endingscreen");
+
+        game.stopBackgroundMusic();
+    },
+
+    removeDeadBodies: function ()
+    {
+        for (let body = box2d.world.GetBodyList(); body; body = body.GetNext())
+        {
+            var entity = body.GetUserData();
+
+            if (entity)
+            {
+                var entityX = body.GetPosition().x * box2d.scale;
+
+                if (entityX < 0 || entityX > game.currentLevel.foregroundImage.width || (entity.health !== undefined && entity.health <= 0))
+                {
+                    box2d.world.DestroyBody(body);
+
+                    if (entity.type === "villain")
+                    {
+                        game.score += entity.calories;
+                        document.getElementById("score").innerHTML = "Score: " + game.score;
+                    }
+
+                    if (entity.breakSound)
+                        entity.breakSound.play();
+                }
+            }
+        }
+    },
+
+    drawSlingshotBand: function ()
+    {
+        game.context.strokeStyle = "rgb(68,31,11)";
+        game.context.lineWidth = 7;
+
+        //use angle hero has been dragged and radius to calculate coordinates of edge of hero
+        var radius = game.currentHero.GetUserData().radius + 1;
+        var heroX = game.currentHero.GetPosition().x * box2d.scale;
+        var heroY = game.currentHero.GetPosition().y * box2d.scale;
+        var angle = Math.atan2(game.slingshotBandY - heroY, game.slingshotBandX - heroX);
+
+        var heroFarEdgeX = heroX - radius * Math.cos(angle);
+        var heroFarEdgeY = heroY - radius * Math.sin(angle);
+
+        game.context.beginPath();
+        game.context.moveTo(game.slingshotBandX - game.offsetLeft, game.slingshotBandY);
+
+        //draw line to center of hero
+        game.context.lineTo(heroX - game.offsetLeft, heroY);
+        game.context.stroke();
+
+        entities.draw(game.currentHero.GetUserData(), game.currentHero.GetPosition(), game.currentHero.GetAngle());
+
+        game.context.beginPath();
+        game.context.moveTo(heroFarEdgeX - game.offsetLeft, heroFarEdgeY);
+
+        game.context.lineTo(game.slingshotBandX - game.offsetLeft - 40, game.slingshotBandY + 15);
+        game.context.stroke();
+    },
+
+    restartLevel: function ()
+    {
+        window.cancelAnimationFrame(game.animationFrame);
+        game.lastUpdateTime = undefined;
+        levels.load(game.currentLevel.number);
+    },
+
+    startNextLevel: function ()
+    {
+        window.cancelAnimationFrame(game.animationFrame);
+        game.lastUpdateTime = undefined;
+        levels.load(game.currentLevel.number + 1);
+    },
+
+    loadSounds: function (onload)
+    {
+        game.backgroundMusic = loader.loadSound("/Audio/gurdonark-kindergarten");
+        game.slingshotReleasedSound = loader.loadSound("/Audio/released");
+        game.bounceSound = loader.loadSound("/Audio/bounce");
+        game.breakSound = {
+            "glass": loader.loadSound("/Audio/glassbreak"),
+            "wood": loader.loadSound("/Audio/woodbreak")
+        };
+
+        loader.onload = onload;
+    }, 
+
+    startBackgroundMusic: function ()
+    {
+        game.backgroundMusic.play();
+        game.setBackgroundMusicButton();
+    },
+
+    stopBackgroundMusic: function ()
+    {
+        game.backgroundMusic.pause();
+        game.backgroundMusic.currentTime = 0;
+        game.setBackgroundMusicButton();
+    },
+
+    toggleBackgroundMusic: function ()
+    {
+        if (game.backgroundMusic.paused)
+            game.startBackgroundMusic.play();
+        else
+            game.startBackgroundMusic.pause();
+
+        game.setBackgroundMusicButton();
+    },
+
+    setBackgroundMusicButton: function ()
+    {
+        var toggleImage = document.getElementById("togglemusic");
+
+        if (game.backgroundMusic.paused)
+            toggleImage.src = "/Images/icons/nosound.png";
+        else
+            toggleImage.src = "/Images/icons/sound.png";
     }
 
 };
@@ -764,6 +893,7 @@ var entities = {
                 entity.fullHealth = definition.fullHealth;
                 entity.shape = "rectangle";
                 entity.sprite = loader.loadImage("/Images/entities/" + entity.name + ".png");
+                entity.breakSound = game.breakSound[entity.name];
 
                 box2d.createRectangle(entity, definition);
                 break;
@@ -777,6 +907,7 @@ var entities = {
                 entity.fullHealth = definition.fullHealth;
                 entity.sprite = loader.loadImage("/Images/entities/" + entity.name + ".png");
                 entity.shape = definition.shape;
+                entity.bounceSound = game.bounceSound;
 
                 if (definition.shape === "circle")
                 {
@@ -841,7 +972,9 @@ var box2d =
 
         box2d.world = new b2World(gravity, allowSleep);
 
-        this.setupDebugDraw();
+        //this.setupDebugDraw();
+
+        this.handleCollisions();
     },
 
     createRectangle: function (entity, definition)
@@ -941,8 +1074,40 @@ var box2d =
         }
 
         box2d.world.Step(timeStep, 8, 3);
-    }
+    },
 
+    handleCollisions: function ()
+    {
+        var listener = new b2ContactListener();
+
+        listener.PostSolve = function (contact, impulse)
+        {
+            var body1 = contact.GetFixtureA().GetBody();
+            var body2 = contact.GetFixtureB().GetBody();
+            var entity1 = body1.GetUserData();
+            var entity2 = body2.GetUserData();
+
+            var impulseAlongNormal = Math.abs(impulse.normalImpulses[0]);
+
+            //filter out tiny impulses
+            if (impulseAlongNormal > 5)
+            {
+                //if objects have a health, reduce
+                if (entity1.health)
+                    entity1.health -= impulseAlongNormal;
+
+                if (entity2.health)
+                    entity2.health -= impulseAlongNormal;
+
+                if (entity1.bounceSound)
+                    entity1.bounceSound.play();
+
+                if (entity2.bounceSound)
+                    entity2.bounceSound.play();
+            }
+        };
+        box2d.world.SetContactListener(listener);
+    }
 
 };
 

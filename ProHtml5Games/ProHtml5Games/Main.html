@@ -16,9 +16,8 @@
             </canvas>
 
             <div id="scorescreen" class="gamelayer">
-                <img id="togglemusic" src="/Images/icons/sound.png" alt="Toggle Music" />
-                <img src="/Images/icons/prev.png" alt="Restart Level" />
-                <img src="/Images/icons/return.png" onclick="location.reload()"/>
+                <img id="togglemusic" src="/Images/icons/sound.png" alt="Toggle Music" onclick="game.toggleBackgroundMusic()" />
+                <img src="/Images/icons/prev.png" alt="Restart Level" onclick="game.restartLevel();"/>
                 <span id="score">Score: 0</span>
             </div>
 
@@ -37,9 +36,9 @@
             <div id="endingscreen" class="gamelayer">
                 <div>
                     <p id="endingmessage">The Level Is Over Message</p>
-                    <p id="playcurrentlevel" class="endingoption"><img src="/Images/icons/prev.png" alt="Replay" />Replay Current Level</p>
-                    <p id="playnextlevel" class="endingoption"><img src="/Images/icons/next.png" alt="Next" />Play Next Level</p>
-                    <p id="returntolevelscreen" class="endingoption"><img src="/Images/icons/return.png" alt="Return" />Return to Level Screen</p>
+                    <p id="playcurrentlevel" class="endingoption" onclick="game.restartLevel()"><img src="/Images/icons/prev.png" alt="Replay" />Replay Current Level</p>
+                    <p id="playnextlevel" class="endingoption" onclick="game.startNextLevel()"><img src="/Images/icons/next.png" alt="Next" />Play Next Level</p>
+                    <p id="returntolevelscreen" class="endingoption" onclick="game.showLevelScreen()"><img src="/Images/icons/return.png" alt="Return" />Return to Level Screen</p>
                 </div>
             </div>
 
