@@ -78,6 +78,7 @@
     <Content Include="Audio\woodbreak.mp3" />
     <Content Include="Audio\woodbreak.ogg" />
     <Content Include="Ch3.html" />
+    <Content Include="Content\mobile.css" />
     <Content Include="Content\styles.css" />
     <Content Include="Global.asax" />
     <Content Include="Images\backgrounds\clouds-background.png" />
@@ -111,12 +112,17 @@
     <Content Include="Images\slingshot-front.png" />
     <Content Include="Images\slingshot.png" />
     <Content Include="Images\splashscreen.png" />
+    <Content Include="Images\splashscreenwide.png" />
     <Content Include="Main.html" />
+    <Content Include="Mobile.html" />
     <Content Include="Scripts\Box2d-demo.js" />
     <Content Include="Scripts\Box2d.js" />
     <Content Include="Scripts\Box2d.min.js" />
     <Content Include="Scripts\game.js" />
+    <Content Include="Scripts\game_mobile.js" />
+    <Content Include="Scripts\wAudio.js" />
     <Content Include="Web.config" />
+    <Content Include="WebAudioExample.html" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Global.asax.cs">

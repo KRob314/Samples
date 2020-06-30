@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Webaudio Example </title>
+</head>
+<body>
+    <input type="button" value="Example 1" onclick="example1()" /><br /><br />
+    <input type="button" value="Example 2" onclick="example2()" /><br /><br />
+    <input type="button" value="Example 3" onclick="example3()" />
+    <script>
+
+        function example1()
+        {
+            // Some browsers support AudioContext, while others support webkitAudioContext
+            var context = new (window.AudioContext || window.webkitAudioContext)();
+            // An oscillator source node just plays a sound at a specific frequency
+            var oscillatorNode = context.createOscillator();
+            // Connect the oscillator directly to the destination
+            oscillatorNode.connect(context.destination);
+            // Start the oscillator now (at the current time)
+            oscillatorNode.start(context.currentTime);
+            // And stop it two seconds after the current time
+            oscillatorNode.stop(context.currentTime + 2);
+        }
+
+        function example2()
+        {
+            var context = new (window.AudioContext || window.webkitAudioContext)();
+            // An oscillator source node just plays a sound at a specific frequency
+            var oscillatorNode = context.createOscillator();
+            // A gain node controls the volume
+            var gainNode = context.createGain();
+            // Set the volume to 1/5th of the original volume
+            gainNode.gain.value = 0.2;
+            // Connect the oscillator to the gain node
+            oscillatorNode.connect(gainNode);
+            // Connect the gain node to the destination
+            gainNode.connect(context.destination);
+            // Start the oscillator now (at the current time)
+            oscillatorNode.start(context.currentTime);
+            // And stop it two seconds after the current ti
+            oscillatorNode.stop(context.currentTime + 2);
+        }
+
+        function example3()
+        {
+            var context = new (window.AudioContext || window.webkitAudioContext)();
+            // Load the audio file using an XMLHttpRequest
+            var request = new XMLHttpRequest();
+            request.open("GET", "/audio/bounce.ogg", true);
+            request.responseType = "arraybuffer";
+            // Wait for the request to load the audio file
+            request.onload = function ()
+            {
+                // Once the audio file has loaded, decode it
+                var undecodedAudio = request.response;
+                context.decodeAudioData(undecodedAudio, function (decodedAudioBuffer)
+                {
+                    // Once the audio has been decoded create a buffer source
+                    var bufferSourceNode = context.createBufferSource();
+                    // Tell the buffer source node to use the decoded audio buffer
+                    bufferSourceNode.buffer = decodedAudioBuffer;
+                    // Connect the buffer source node to the destination
+                    bufferSourceNode.connect(context.destination);
+                    // Start playing the buffer source node now
+                    bufferSourceNode.start(context.currentTime);
+                });
+            };
+            // Finally initiate the request
+            request.send();
+        }
+    </script>
+</body>
+</html>
