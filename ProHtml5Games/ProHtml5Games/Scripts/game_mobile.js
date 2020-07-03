@@ -739,7 +739,35 @@ var levels = {
             { type: "hero", name: "orange", x: 80, y: 405 },
             { type: "hero", name: "apple", x: 140, y: 405 }
         ]
-    }],
+        },
+        {   // Third level
+            foreground: "Desert_Background3",
+            background: "clouds-background",
+            entities: [
+                // The ground
+                { type: "ground", name: "dirt", x: 500, y: 440, width: 1000, height: 20, isStatic: true },
+                // The slingshot wooden frame
+                { type: "ground", name: "wood", x: 190, y: 390, width: 30, height: 80, isStatic: true },
+
+                { type: "block", name: "wood", x: 850, y: 380, angle: 90, width: 100, height: 25 },
+                { type: "block", name: "wood", x: 700, y: 380, angle: 90, width: 100, height: 25 },
+                { type: "block", name: "wood", x: 550, y: 380, angle: 90, width: 100, height: 25 },
+                { type: "block", name: "glass", x: 625, y: 316, width: 150, height: 25 },
+                { type: "block", name: "glass", x: 775, y: 316, width: 150, height: 25 },
+
+                { type: "block", name: "glass", x: 625, y: 252, angle: 90, width: 100, height: 25 },
+                { type: "block", name: "glass", x: 775, y: 252, angle: 90, width: 100, height: 25 },
+                { type: "block", name: "wood", x: 700, y: 190, width: 150, height: 25 },
+
+                { type: "villain", name: "burger", x: 700, y: 152, calories: 590 },
+                { type: "villain", name: "fries", x: 625, y: 405, calories: 420 },
+                { type: "villain", name: "sodacan", x: 775, y: 400, calories: 150 },
+
+                { type: "hero", name: "strawberry", x: 30, y: 415 },
+                { type: "hero", name: "orange", x: 80, y: 405 },
+                { type: "hero", name: "apple", x: 140, y: 405 }
+            ]
+        }],
 
     // Initialize level selection screen
     init: function ()
