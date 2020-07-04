@@ -100,7 +100,7 @@
         game.currentMap = maps[level.mapName];
 
         // Load all the assets for the level starting with the map image
-        game.currentMapImage = loader.loadImage("images/maps/" + maps[level.mapName].mapImage);
+        game.currentMapImage = loader.loadImage("/Images/maps/" + maps[level.mapName].mapImage);
 
         // Initialize all the arrays for the game
         game.resetArrays();
@@ -152,6 +152,7 @@
         {
             item.animate();
         });
+
         // Sort game items into a sortedItems array based on their x,y coordinates
         game.sortedItems = Object.assign([], game.items);
         game.sortedItems.sort(function (a, b)
@@ -174,12 +175,17 @@
         // Draw the background whenever necessary
         game.drawBackground();
 
+        // Clear the foreground canvas
         game.foregroundContext.clearRect(0, 0, game.canvasWidth, game.canvasHeight);
 
+        // Start drawing the foreground elements
         game.sortedItems.forEach(function (item)
         {
             item.draw();
         });
+
+        // Draw the mouse
+        mouse.draw();
 
         // Call the drawing loop for the next frame using request animation frame
         if (game.running)
@@ -286,21 +292,23 @@
 
     resetArrays: function ()
     {
-        //count items added in game
+        // Count items added in game, to assign them a unique id
         game.counter = 0;
 
+        // Track all the items currently in the game
         game.items = [];
         game.buildings = [];
         game.vehicles = [];
         game.aircraft = [];
         game.terrain = [];
-        game.selectedItems = [];
 
+        // Track items that have been selected by the player
+        game.selectedItems = [];
     },
 
     add: function (itemDetails)
     {
-        //set unique id
+        // Set a unique id for the item
         if (!itemDetails.uid)
         {
             itemDetails.uid = ++game.counter;
@@ -308,6 +316,10 @@
 
         var item = window[itemDetails.type].add(itemDetails);
 
+        // Add the item to the items array
+        game.items.push(item);
+
+        // Add the item to the type specific array
         game[item.type].push(item);
 
         return item;
@@ -315,6 +327,7 @@
 
     remove: function (item)
     {
+        // Unselect item if it is selected
         item.selected = false;
         for (let i = game.selectedItems.length - 1; i >= 0; i--)
         {
@@ -325,7 +338,7 @@
             }
         }
 
-        //remove from array
+        // Remove item from the items array
         for (let i = game.items.length - 1; i >= 0; i--)
         {
             if (game.items[i].uid === item.uid)
@@ -335,6 +348,7 @@
             }
         }
 
+        // Remove items from the type specific array
         for (let i = game[item.type].length - 1; i >= 0; i--)
         {
             if (game[item.type][i].uid === item.uid)
@@ -343,7 +357,42 @@
                 break;
             }
         }
-    }
+    },
+
+    clearSelection: function ()
+    {
+        while (game.selectedItems.length > 0)
+        {
+            game.selectedItems.pop().selected = false;
+        }
+    },
+
+    selectItem: function (item, shiftPressed)
+    {
+        // Pressing shift and clicking on a selected item will deselect it
+        if (shiftPressed && item.selected)
+        {
+            // Deselect item
+            item.selected = false;
+
+            for (let i = game.selectedItems.length - 1; i >= 0; i--)
+            {
+                if (game.selectedItems[i].uid === item.uid)
+                {
+                    game.selectedItems.splice(i, 1);
+                    break;
+                }
+            }
+
+            return;
+        }
+
+        if (item.selectable && !item.selected)
+        {
+            item.selected = true;
+            game.selectedItems.push(item);
+        }
+    },
 };
 
 /* Set up inital window event listeners */

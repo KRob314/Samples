@@ -2,7 +2,7 @@
 
 #wrapper { position: absolute; /* Wrapper covers entire window height and width */ top: 0; bottom: 0; left: 0; right: 0; /* Prevent the ugly blue highlighting from accidental selection of text */ user-select: none; }
 
-#gamecontainer { /* Start with a default width that we can change later */ width: 640px; height: 480px; /* Use a wider splash screen and center it within the container */ background: url("/images/screens/splashscreen.png"); background-position: center; background-repeat: no-repeat; /* Center the game container relative to outer wrapper */ position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); transform-origin: center center; }
+#gamecontainer { /* Start with a default width that we can change later */ width: 640px; height: 480px; /* Use a wider splash screen and center it within the container */ background: url("/Images/screens/splashscreen.png"); background-position: center; background-repeat: no-repeat; /* Center the game container relative to outer wrapper */ position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); transform-origin: center center; }
 
 .gamelayer { width: 100%; height: 100%; position: absolute; display: none; }
 
@@ -18,13 +18,13 @@
 
 #loadingscreen { background: rgba(100, 100, 100, 0.7); }
 
-#loadingmessage { position: relative; top: 400px; text-align: center; height: 48px; color: white; background: url("/images/loader.gif") no-repeat center; font: 12px Arial; }
+#loadingmessage { position: relative; top: 400px; text-align: center; height: 48px; color: white; background: url("/Images/loader.gif") no-repeat center; font: 12px Arial; }
 
 /* Mission Briefing Screen */
 
-#missionbriefingscreen { background: url("/images/screens/interface-middle.png"); }
+#missionbriefingscreen { background: url("/Images/screens/interface-middle.png"); }
 
-input[type="button"] { border-width: 0; outline: none; background-color: transparent; background-repeat: no-repeat; background-image: url("/images/buttons.png"); cursor: pointer; }
+input[type="button"] { border-width: 0; outline: none; background-color: transparent; background-repeat: no-repeat; background-image: url("/Images/buttons.png"); cursor: pointer; }
 
 .left-panel { left: 0; top: 0; position: absolute; }
 
@@ -42,7 +42,7 @@ input[type="button"] { border-width: 0; outline: none; background-color: transpa
 
 /* Game Interface Screen */
 
-#gameinterfacescreen { background: url("/images/screens/interface-middle.png"); }
+#gameinterfacescreen { background: url("/Images/screens/interface-middle.png"); }
 
     #gameinterfacescreen #gamemessages { position: absolute; padding: 5px; top: 4px; left: 5px; right: 168px; height: 60px; color: rgb(130, 150, 162); overflow: hidden; font-size: 13px; font-family: "Courier New", Courier, monospace; }
 
