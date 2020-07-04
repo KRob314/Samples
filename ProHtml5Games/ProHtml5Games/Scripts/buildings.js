@@ -42,6 +42,48 @@
 
     defaults: {
         type: "buildings",
+
+        processActions: function ()
+        {
+            switch (this.action)
+            {
+                case "stand":
+                    this.imageList = this.spriteArray[this.lifeCode];
+                    this.imageOffset = this.imageList.offset + this.animationIndex;
+                    this.animationIndex++;
+
+                    if (this.animationIndex >= this.imageList.count)
+                    {
+                        this.animationIndex = 0;
+                    }
+
+                    break;
+
+                case "construct":
+                    this.imageList = this.spriteArray["constructing"];
+                    this.imageOffset = this.imageList.offset + this.animationIndex;
+                    this.animationIndex++;
+
+                    if (this.animationIndex >= this.imageList.count)
+                    {
+                        this.animationIndex = 0;
+                        this.action = "stand";
+                    }
+                    break;
+            }
+        },
+
+        drawSprite: function ()
+        {
+            let x = this.drawingX;
+            let y = this.drawingY;
+
+            //blue in the first row, green in the second
+            let colorIndex = (this.team === "blue") ? 0 : 1;
+            let colorOffset = colorIndex * this.pixelHeight;
+
+            game.foregroundContext.drawImage(this.spriteSheet, this.imageOffset * this.pixelWidth, colorOffset, this.pixelWidth, this.pixelHeight, x, y, this.pixelWidth, this.pixelHeight);
+        }
     },
 
     load: loadItem,

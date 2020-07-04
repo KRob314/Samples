@@ -101,6 +101,32 @@
 
         // Load all the assets for the level starting with the map image
         game.currentMapImage = loader.loadImage("images/maps/" + maps[level.mapName].mapImage);
+
+        // Initialize all the arrays for the game
+        game.resetArrays();
+
+        // Load all the assets for every entity defined in the level requirements array
+        for (let type in level.requirements)
+        {
+            let requirementArray = level.requirements[type];
+
+            requirementArray.forEach(function (name)
+            {
+                if (window[type] && typeof window[type].load === "function")
+                {
+                    window[type].load(name);
+                } else
+                {
+                    console.log("Could not load type :", type);
+                }
+            });
+        }
+
+        // Add all the items defined in the level items array to the game
+        level.items.forEach(function (itemDetails)
+        {
+            game.add(itemDetails);
+        });
     },
 
     start: function ()
@@ -121,7 +147,17 @@
 
     animationLoop: function ()
     {
-
+        // Animate each of the elements within the game
+        game.items.forEach(function (item)
+        {
+            item.animate();
+        });
+        // Sort game items into a sortedItems array based on their x,y coordinates
+        game.sortedItems = Object.assign([], game.items);
+        game.sortedItems.sort(function (a, b)
+        {
+            return a.y - b.y + ((a.y === b.y) ? (b.x - a.x) : 0);
+        });
     },
 
     // The map is broken into square tiles of this size (20 pixels x 20 pixels)
@@ -137,6 +173,13 @@
 
         // Draw the background whenever necessary
         game.drawBackground();
+
+        game.foregroundContext.clearRect(0, 0, game.canvasWidth, game.canvasHeight);
+
+        game.sortedItems.forEach(function (item)
+        {
+            item.draw();
+        });
 
         // Call the drawing loop for the next frame using request animation frame
         if (game.running)
@@ -240,6 +283,67 @@
             mouse.calculateGameCoordinates();
         }
     },
+
+    resetArrays: function ()
+    {
+        //count items added in game
+        game.counter = 0;
+
+        game.items = [];
+        game.buildings = [];
+        game.vehicles = [];
+        game.aircraft = [];
+        game.terrain = [];
+        game.selectedItems = [];
+
+    },
+
+    add: function (itemDetails)
+    {
+        //set unique id
+        if (!itemDetails.uid)
+        {
+            itemDetails.uid = ++game.counter;
+        }
+
+        var item = window[itemDetails.type].add(itemDetails);
+
+        game[item.type].push(item);
+
+        return item;
+    },
+
+    remove: function (item)
+    {
+        item.selected = false;
+        for (let i = game.selectedItems.length - 1; i >= 0; i--)
+        {
+            if (game.selectedItems[i].uid === item.uid)
+            {
+                game.selectedItems.splice(i, 1);
+                break;
+            }
+        }
+
+        //remove from array
+        for (let i = game.items.length - 1; i >= 0; i--)
+        {
+            if (game.items[i].uid === item.uid)
+            {
+                game.items.splice(i, 1);
+                break;
+            }
+        }
+
+        for (let i = game[item.type].length - 1; i >= 0; i--)
+        {
+            if (game[item.type][i].uid === item.uid)
+            {
+                game[item.type].splice(i, 1);
+                break;
+            }
+        }
+    }
 };
 
 /* Set up inital window event listeners */
