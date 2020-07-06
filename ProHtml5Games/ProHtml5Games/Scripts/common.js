@@ -98,7 +98,7 @@ function loadItem(name)
         return;
     }
 
-    item.spriteSheet = loader.loadImage("/Images/" + this.defaults.type + "/" + name + ".png");
+    item.spriteSheet = loader.loadImage("images/" + this.defaults.type + "/" + name + ".png");
     item.spriteArray = [];
     item.spriteCount = 0;
 
@@ -239,6 +239,13 @@ var baseItem = {
         this.drawingX = (this.x * game.gridSize) - game.offsetX - this.pixelOffsetX;
         this.drawingY = (this.y * game.gridSize) - game.offsetY - this.pixelOffsetY;
 
+        // Adjust based on interpolation factor
+        if (this.canMove)
+        {
+            this.drawingX += this.lastMovementX * game.drawingInterpolationFactor * game.gridSize;
+            this.drawingY += this.lastMovementY * game.drawingInterpolationFactor * game.gridSize;
+        }
+
         if (this.selected)
         {
             this.drawSelection();
@@ -256,5 +263,80 @@ var baseItem = {
     lifeBarDamagedFillColor: "rgba(255,0,0,0.5)",
 
     lifeBarHeight: 5,
+
+    /* Movement related properties */
+    speedAdjustmentFactor: 1 / 64,
+    turnSpeedAdjustmentFactor: 1 / 8,
+
+    // Finds the angle towards a destination in terms of a direction (0 <= angle < directions)
+    findAngle: function (destination)
+    {
+        var dy = destination.y - this.y;
+        var dx = destination.x - this.x;
+
+        // Convert Arctan to value between (0 - directions)
+        var angle = this.directions / 2 - (Math.atan2(dx, dy) * this.directions / (2 * Math.PI));
+
+        angle = (angle + this.directions) % this.directions;
+
+        return angle;
+    },
+
+    // Return the smallest difference (between -directions/2 and +directions/2) towards newDirection
+    angleDiff: function (newDirection)
+    {
+        let currentDirection = this.direction;
+        let directions = this.directions;
+
+        // Make both directions between -directions/2 and +directions/2
+        if (currentDirection >= directions / 2)
+        {
+            currentDirection -= directions;
+        }
+
+        if (newDirection >= directions / 2)
+        {
+            newDirection -= directions;
+        }
+
+        var difference = newDirection - currentDirection;
+
+        // Ensure difference is also between -directions/2 and +directions/2
+        if (difference < -directions / 2)
+        {
+            difference += directions;
+        }
+
+        if (difference > directions / 2)
+        {
+            difference -= directions;
+        }
+
+        return difference;
+    },
+
+    turnTo: function (newDirection)
+    {
+        // Calculate difference between new direction and current direction
+        let difference = this.angleDiff(newDirection);
+
+        // Calculate maximum amount that aircraft can turn per animation cycle
+        let turnAmount = this.turnSpeed * this.turnSpeedAdjustmentFactor;
+
+        if (Math.abs(difference) > turnAmount)
+        {
+            // Change direction by turn amount
+            this.direction += turnAmount * Math.abs(difference) / difference;
+
+            // Ensure direction doesn't go below 0 or above this.directions
+            this.direction = (this.direction + this.directions) % this.directions;
+
+            this.turning = true;
+        } else
+        {
+            this.direction = newDirection;
+            this.turning = false;
+        }
+    },
 
 };

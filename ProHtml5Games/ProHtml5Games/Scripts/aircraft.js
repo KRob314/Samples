@@ -42,7 +42,7 @@
             pixelShadowHeight: 40,
             spriteImages: [
                 { name: "stand", count: 1, directions: 8 }
-            ],
+            ]
         }
     },
 
@@ -129,9 +129,61 @@
             game.foregroundContext.lineTo(x, y + this.pixelShadowHeight);
             game.foregroundContext.stroke();
         },
+
+        processOrders: function ()
+        {
+            this.lastMovementX = 0;
+            this.lastMovementY = 0;
+
+            if (this.orders.to)
+            {
+                var distanceFromDestination = Math.pow(Math.pow(this.orders.to.x - this.x, 2) + Math.pow(this.orders.to.y - this.y, 2), 0.5);
+                var radius = this.radius / game.gridSize;
+            }
+
+            switch (this.orders.type)
+            {
+                case "move":
+                    // Move toward destination until distance from destination is less than aircraft radius
+                    if (distanceFromDestination < radius)
+                    {
+                        this.orders = { type: "stand" };
+                    } else
+                    {
+                        this.moveTo(this.orders.to, distanceFromDestination);
+                    }
+
+                    break;
+            }
+        },
+
+        // How slow should unit move while turning
+        speedAdjustmentWhileTurningFactor: 0.4,
+
+        moveTo: function (destination, distanceFromDestination)
+        {
+            // Find out where we need to turn to get to destination
+            let newDirection = this.findAngle(destination);
+
+            // Turn towards new direction if necessary
+            this.turnTo(newDirection);
+
+            // Calculate maximum distance that aircraft can move per animation cycle
+            let maximumMovement = this.speed * this.speedAdjustmentFactor * (this.turning ? this.speedAdjustmentWhileTurningFactor : 1);
+            let movement = Math.min(maximumMovement, distanceFromDestination);
+
+            // Calculate x and y components of the movement
+            let angleRadians = -((this.direction) / this.directions) * 2 * Math.PI;
+
+            this.lastMovementX = -(movement * Math.sin(angleRadians));
+            this.lastMovementY = -(movement * Math.cos(angleRadians));
+
+            this.x = this.x + this.lastMovementX;
+            this.y = this.y + this.lastMovementY;
+        }
     },
 
     load: loadItem,
-    add: addItem,
+    add: addItem
 };
 

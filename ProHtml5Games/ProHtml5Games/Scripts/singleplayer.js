@@ -33,6 +33,8 @@
         game.offsetX = level.startX * game.gridSize;
         game.offsetY = level.startY * game.gridSize;
 
+        game.createTerrainGrid();
+
         // Enable the enter mission button once all assets are loaded
         loader.onload = function ()
         {
@@ -70,6 +72,11 @@
         game.animationInterval = setInterval(game.animationLoop, game.animationTimeout);
 
         game.start();
+    },
+
+    sendCommand: function (uids, details)
+    {
+        game.processCommand(uids, details);
     },
 
 };

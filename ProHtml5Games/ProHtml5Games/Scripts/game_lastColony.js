@@ -100,7 +100,7 @@
         game.currentMap = maps[level.mapName];
 
         // Load all the assets for the level starting with the map image
-        game.currentMapImage = loader.loadImage("/Images/maps/" + maps[level.mapName].mapImage);
+        game.currentMapImage = loader.loadImage("images/maps/" + maps[level.mapName].mapImage);
 
         // Initialize all the arrays for the game
         game.resetArrays();
@@ -147,6 +147,15 @@
 
     animationLoop: function ()
     {
+        // Process orders for any item that handles orders
+        game.items.forEach(function (item)
+        {
+            if (item.processOrders)
+            {
+                item.processOrders();
+            }
+        });
+
         // Animate each of the elements within the game
         game.items.forEach(function (item)
         {
@@ -159,6 +168,9 @@
         {
             return a.y - b.y + ((a.y === b.y) ? (b.x - a.x) : 0);
         });
+
+        // Save the time that the last animation loop completed
+        game.lastAnimationTime = Date.now();
     },
 
     // The map is broken into square tiles of this size (20 pixels x 20 pixels)
@@ -171,6 +183,22 @@
     {
         // Pan the map if the cursor is near the edge of the canvas
         game.handlePanning();
+
+        // Check the time since the game was animated and calculate a linear interpolation factor (-1 to 0)
+        game.lastDrawTime = Date.now();
+        if (game.lastAnimationTime)
+        {
+            game.drawingInterpolationFactor = (game.lastDrawTime - game.lastAnimationTime) / game.animationTimeout - 1;
+
+            // No point interpolating beyond the next animation loop...
+            if (game.drawingInterpolationFactor > 0)
+            {
+                game.drawingInterpolationFactor = 0;
+            }
+        } else
+        {
+            game.drawingInterpolationFactor = -1;
+        }
 
         // Draw the background whenever necessary
         game.drawBackground();
@@ -237,7 +265,6 @@
         {
             return;
         }
-
 
         if (mouse.x <= game.panningThreshold)
         {
@@ -322,6 +349,12 @@
         // Add the item to the type specific array
         game[item.type].push(item);
 
+        // Reset currentMapPassableGrid whenever the map changes
+        if (item.type === "buildings" || item.type === "terrain")
+        {
+            game.currentMapPassableGrid = undefined;
+        }
+
         return item;
     },
 
@@ -356,6 +389,12 @@
                 game[item.type].splice(i, 1);
                 break;
             }
+        }
+
+        // Reset currentMapPassableGrid whenever the map changes
+        if (item.type === "buildings" || item.type === "terrain")
+        {
+            game.currentMapPassableGrid = undefined;
         }
     },
 
@@ -393,6 +432,137 @@
             game.selectedItems.push(item);
         }
     },
+
+    // Send command to either singleplayer or multiplayer object
+    sendCommand: function (uids, details)
+    {
+        if (game.type === "singleplayer")
+        {
+            singleplayer.sendCommand(uids, details);
+        } else
+        {
+            multiplayer.sendCommand(uids, details);
+        }
+    },
+
+    getItemByUid: function (uid)
+    {
+        for (let i = game.items.length - 1; i >= 0; i--)
+        {
+            if (game.items[i].uid === uid)
+            {
+                return game.items[i];
+            }
+        }
+    },
+
+    // Receive command from singleplayer or multiplayer object and send it to units
+    processCommand: function (uids, details)
+    {
+        // In case the target "to" object is in terms of uid, fetch the target object
+        var toObject;
+
+        if (details.toUid)
+        {
+            toObject = game.getItemByUid(details.toUid);
+            if (!toObject || toObject.lifeCode === "dead")
+            {
+                // To object no longer exists. Invalid command
+                return;
+            }
+        }
+
+        uids.forEach(function (uid)
+        {
+            let item = game.getItemByUid(uid);
+
+            // If uid is for a valid item, set the order for the item
+            if (item)
+            {
+                item.orders = Object.assign({}, details);
+                if (toObject)
+                {
+                    item.orders.to = toObject;
+                }
+            }
+        });
+    },
+
+    // Create a grid that stores all obstructed tiles as 1 and unobstructed as 0
+    createTerrainGrid: function ()
+    {
+
+        let map = game.currentMap;
+
+        // Initialize Terrain Grid to 2d array of zeroes
+        game.currentMapTerrainGrid = new Array(map.gridMapHeight);
+
+        var row = new Array(map.gridMapWidth);
+
+        for (let x = 0; x < map.mapGridWidth; x++)
+        {
+            row[x] = 0;
+        }
+
+        for (let y = 0; y < map.mapGridHeight; y++)
+        {
+            game.currentMapTerrainGrid[y] = row.slice(0);
+        }
+
+        // Take all the obstructed terrain coordinates and mark them on the terrain grid as unpassable
+        map.mapObstructedTerrain.forEach(function (obstruction)
+        {
+            game.currentMapTerrainGrid[obstruction[1]][obstruction[0]] = 1;
+        }, this);
+
+        // Reset the passable grid
+        game.currentMapPassableGrid = undefined;
+
+        game.rebuildPassableGrid();
+
+    },
+
+    // Make a copy of a 2 Dimensional Array
+    makeArrayCopy: function (originalArray)
+    {
+        var length = originalArray.length;
+        var copy = new Array(length);
+
+        for (let i = 0; i < length; i++)
+        {
+            copy[i] = originalArray[i].slice(0);
+        }
+
+        return copy;
+    },
+
+    rebuildPassableGrid: function ()
+    {
+
+        // Initialize Passable Grid with the value of Terrain Grid
+        game.currentMapPassableGrid = game.makeArrayCopy(game.currentMapTerrainGrid);
+
+        // Also mark all building and terrain as unpassable items
+        for (let i = game.items.length - 1; i >= 0; i--)
+        {
+            var item = game.items[i];
+
+            if (item.type === "buildings" || item.type === "terrain")
+            {
+                for (let y = item.passableGrid.length - 1; y >= 0; y--)
+                {
+                    for (let x = item.passableGrid[y].length - 1; x >= 0; x--)
+                    {
+                        if (item.passableGrid[y][x])
+                        {
+                            game.currentMapPassableGrid[item.y + y][item.x + x] = 1;
+                        }
+                    }
+                }
+            }
+        }
+    },
+
 };
 
 /* Set up inital window event listeners */

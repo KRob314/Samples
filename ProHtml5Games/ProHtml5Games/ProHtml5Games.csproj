@@ -180,6 +180,7 @@
     <Content Include="Main.html" />
     <Content Include="Mobile.html" />
     <Content Include="Scripts\aircraft.js" />
+    <Content Include="Scripts\astar.js" />
     <Content Include="Scripts\Box2d-demo.js" />
     <Content Include="Scripts\Box2d.js" />
     <Content Include="Scripts\Box2d.min.js" />
