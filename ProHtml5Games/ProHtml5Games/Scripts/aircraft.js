@@ -42,7 +42,7 @@
             pixelShadowHeight: 40,
             spriteImages: [
                 { name: "stand", count: 1, directions: 8 }
-            ]
+            ],
         }
     },
 
@@ -66,6 +66,34 @@
                     if (this.animationIndex >= this.imageList.count)
                     {
                         this.animationIndex = 0;
+                    }
+
+                    break;
+
+                case "teleport":
+
+                    this.imageList = this.spriteArray["stand-" + direction];
+                    this.imageOffset = this.imageList.offset + this.animationIndex;
+                    this.animationIndex++;
+
+                    if (this.animationIndex >= this.imageList.count)
+                    {
+                        this.animationIndex = 0;
+                    }
+
+                    // Initialize the brightness variable when unit is first teleported
+                    if (this.brightness === undefined)
+                    {
+                        this.brightness = 0.6;
+                    }
+
+                    this.brightness -= 0.05;
+
+                    // Once brightness gets to zero, clear brightness and just stand normally
+                    if (this.brightness <= 0)
+                    {
+                        this.brightness = undefined;
+                        this.action = "stand";
                     }
 
                     break;
@@ -173,17 +201,17 @@
             let movement = Math.min(maximumMovement, distanceFromDestination);
 
             // Calculate x and y components of the movement
-            let angleRadians = -((this.direction) / this.directions) * 2 * Math.PI;
+            let angleRadians = -(this.direction / this.directions) * 2 * Math.PI;
 
             this.lastMovementX = -(movement * Math.sin(angleRadians));
             this.lastMovementY = -(movement * Math.cos(angleRadians));
 
             this.x = this.x + this.lastMovementX;
             this.y = this.y + this.lastMovementY;
-        }
+        },
     },
 
     load: loadItem,
-    add: addItem
+    add: addItem,
 };
 

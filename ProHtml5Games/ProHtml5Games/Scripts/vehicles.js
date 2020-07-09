@@ -100,6 +100,34 @@
                     }
 
                     break;
+
+                case "teleport":
+
+                    this.imageList = this.spriteArray["stand-" + direction];
+                    this.imageOffset = this.imageList.offset + this.animationIndex;
+                    this.animationIndex++;
+
+                    if (this.animationIndex >= this.imageList.count)
+                    {
+                        this.animationIndex = 0;
+                    }
+
+                    // Initialize the brightness variable when unit is first teleported
+                    if (this.brightness === undefined)
+                    {
+                        this.brightness = 0.6;
+                    }
+
+                    this.brightness -= 0.05;
+
+                    // Once brightness gets to zero, clear brightness and just stand normally
+                    if (this.brightness <= 0)
+                    {
+                        this.brightness = undefined;
+                        this.action = "stand";
+                    }
+
+                    break;
             }
         },
 
@@ -327,10 +355,10 @@
             let maximumMovement = this.speed * this.speedAdjustmentFactor * (this.turning ? this.speedAdjustmentWhileTurningFactor : 1);
             let movement = Math.min(maximumMovement, distanceFromDestination);
 
-            // Don't move if we are in a hard collision
+            // Don't move forward if we are in a hard collision
             if (this.hardCollision)
             {
-                movement = 0;
+                movement = -movement * 0.5;
             }
 
             // Calculate x and y components of the movement
@@ -351,7 +379,7 @@
         {
             // Calculate new position on present path at maximum speed
             let movement = this.speed * this.speedAdjustmentFactor;
-            let angleRadians = -((this.direction) / this.directions) * 2 * Math.PI;
+            let angleRadians = -(this.direction / this.directions) * 2 * Math.PI;
             let newX = this.x - (movement * Math.sin(angleRadians));
             let newY = this.y - (movement * Math.cos(angleRadians));
 

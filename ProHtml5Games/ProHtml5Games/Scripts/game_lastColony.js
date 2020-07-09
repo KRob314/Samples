@@ -6,6 +6,7 @@
         // Initialize objects
         loader.init();
         mouse.init();
+        sidebar.init();
 
         // Initialize and store contexts for both the canvases
         game.initCanvases();
@@ -127,6 +128,12 @@
         {
             game.add(itemDetails);
         });
+
+        // Load starting cash for the level
+        game.cash = Object.assign({}, level.cash);
+
+        sidebar.initRequirementsForLevel();
+
     },
 
     start: function ()
@@ -140,6 +147,17 @@
         game.canvasResized = true;
 
         game.drawingLoop();
+
+        // Clear the game messages area
+        let gamemessages = document.getElementById("gamemessages");
+
+        gamemessages.innerHTML = "";
+
+        // Initialize All Game Triggers
+        game.currentLevel.triggers.forEach(function (trigger)
+        {
+            game.initTrigger(trigger);
+        });
     },
 
     // A control loop that runs at a fixed period of time
@@ -147,6 +165,10 @@
 
     animationLoop: function ()
     {
+
+        // Animate the sidebar
+        sidebar.animate();
+
         // Process orders for any item that handles orders
         game.items.forEach(function (item)
         {
@@ -561,6 +583,220 @@
                 }
             }
         }
+    },
+
+    // Profile pictures for game characters
+    characters: {
+        "system": {
+            "name": "System Control",
+            "image": "system.png"
+        },
+    },
+
+    showMessage: function (from, message)
+    {
+        let callerpicture = document.getElementById("callerpicture");
+        let gamemessages = document.getElementById("gamemessages");
+
+        // If the message is from a defined game character, show profile picture
+        let character = game.characters[from];
+
+        if (character)
+        {
+
+            // Use the character's defined name
+            from = character.name;
+
+            if (character.image)
+            {
+                // Display the character image in the caller picture area
+                callerpicture.innerHTML = "<img src=\"images/characters/" + character.image + "\"/>";
+
+                // Remove the caller picture after six seconds
+                setTimeout(function ()
+                {
+                    callerpicture.innerHTML = "";
+                }, 6000);
+            }
+        }
+
+        // Append message to messages pane and scroll to the bottom
+
+        let messageHTML = "<span>" + from + ": </span>" + message + "<br>";
+
+        gamemessages.innerHTML += messageHTML;
+        gamemessages.scrollTop = gamemessages.scrollHeight;
+
+    },
+
+    rebuildBuildableGrid: function ()
+    {
+        game.currentMapBuildableGrid = game.makeArrayCopy(game.currentMapTerrainGrid);
+
+        game.items.forEach(function (item)
+        {
+
+            if (item.type === "buildings" || item.type === "terrain")
+            {
+                // Mark all squares that the building uses as unbuildable
+                for (let y = item.buildableGrid.length - 1; y >= 0; y--)
+                {
+                    for (let x = item.buildableGrid[y].length - 1; x >= 0; x--)
+                    {
+                        if (item.buildableGrid[y][x])
+                        {
+                            game.currentMapBuildableGrid[item.y + y][item.x + x] = 1;
+                        }
+                    }
+                }
+            } else if (item.type === "vehicles")
+            {
+                // Mark all squares under or near the vehicle as unbuildable
+                let radius = item.radius / game.gridSize;
+                let x1 = Math.max(Math.floor(item.x - radius), 0);
+                let x2 = Math.min(Math.floor(item.x + radius), game.currentMap.mapGridWidth - 1);
+                let y1 = Math.max(Math.floor(item.y - radius), 0);
+                let y2 = Math.min(Math.floor(item.y + radius), game.currentMap.mapGridHeight - 1);
+
+                for (let x = x1; x <= x2; x++)
+                {
+                    for (let y = y1; y <= y2; y++)
+                    {
+                        game.currentMapBuildableGrid[y][x] = 1;
+                    }
+                }
+            }
+
+        });
+    },
+
+    /* Message Box related code*/
+
+    messageBoxOkCallback: undefined,
+    messageBoxCancelCallback: undefined,
+    showMessageBox: function (message, onOK, onCancel)
+    {
+        // Set message box text
+        let messageBoxText = document.getElementById("messageboxtext");
+
+        messageBoxText.innerHTML = message.replace(/\n/g, "<br><br>");
+
+        // Set message box onOK handler
+        if (typeof onOK === "function")
+        {
+            game.messageBoxOkCallback = onOK;
+        } else
+        {
+            game.messageBoxOkCallback = undefined;
+        }
+
+        // Set onCancel handler if defined and show Cancel button
+        let cancelButton = document.getElementById("messageboxcancel");
+
+        if (typeof onCancel === "function")
+        {
+            game.messageBoxCancelCallback = onCancel;
+            // Show the cancel button
+            cancelButton.style.display = "";
+        } else
+        {
+            game.messageBoxCancelCallback = undefined;
+            // Hide the cancel button
+            cancelButton.style.display = "none";
+        }
+
+        // Display the message box and wait for user to click a button
+        game.showScreen("messageboxscreen");
+    },
+
+    messageBoxOK: function ()
+    {
+        game.hideScreen("messageboxscreen");
+        if (typeof game.messageBoxOkCallback === "function")
+        {
+            game.messageBoxOkCallback();
+        }
+    },
+
+    messageBoxCancel: function ()
+    {
+        game.hideScreen("messageboxscreen");
+        if (typeof game.messageBoxCancelCallback === "function")
+        {
+            game.messageBoxCancelCallback();
+        }
+    },
+
+    /* Methods for handling triggered events within the game */
+
+    initTrigger: function (trigger)
+    {
+        if (trigger.type === "timed")
+        {
+            trigger.timeout = setTimeout(function ()
+            {
+                game.runTrigger(trigger);
+            }, trigger.time);
+        } else if (trigger.type === "conditional")
+        {
+            trigger.interval = setInterval(function ()
+            {
+                game.runTrigger(trigger);
+            }, 1000);
+        }
+    },
+
+    runTrigger: function (trigger)
+    {
+        if (trigger.type === "timed")
+        {
+            // Re initialize the trigger based on repeat settings
+            if (trigger.repeat)
+            {
+                game.initTrigger(trigger);
+            }
+            // Call the trigger action
+            trigger.action(trigger);
+        } else if (trigger.type === "conditional")
+        {
+            //Check if the condition has been satisfied
+            if (trigger.condition())
+            {
+                // Clear the trigger
+                game.clearTrigger(trigger);
+                // Call the trigger action
+                trigger.action(trigger);
+            }
+        }
+    },
+
+    clearTrigger: function (trigger)
+    {
+        if (trigger.timeout !== undefined)
+        {
+            clearTimeout(trigger.timeout);
+            trigger.timeout = undefined;
+        }
+
+        if (trigger.interval !== undefined)
+        {
+            clearInterval(trigger.interval);
+            trigger.interval = undefined;
+        }
+    },
+
+    end: function ()
+    {
+        // Clear Any Game Triggers
+        if (game.currentLevel.triggers)
+        {
+            for (var i = game.currentLevel.triggers.length - 1; i >= 0; i--)
+            {
+                game.clearTrigger(game.currentLevel.triggers[i]);
+            }
+        }
+
+        game.running = false;
     },
 
 };

@@ -66,7 +66,7 @@
 
     checkIfDragging: function ()
     {
-        if (mouse.buttonPressed)
+        if (mouse.buttonPressed && !sidebar.deployBuilding)
         {
             // If the mouse has been dragged more than threshold treat it as a drag
             if ((Math.abs(mouse.dragX - mouse.gameX) > mouse.dragSelectThreshold && Math.abs(mouse.dragY - mouse.gameY) > mouse.dragSelectThreshold))
@@ -109,6 +109,19 @@
     // Called whenever player completes a left click on the game canvas
     leftClick: function (shiftPressed)
     {
+        if (sidebar.deployBuilding)
+        {
+            if (sidebar.canDeployBuilding)
+            {
+                sidebar.finishDeployingBuilding();
+            } else
+            {
+                game.showMessage("system", "Warning! Cannot deploy building here.");
+            }
+
+            return;
+        }
+
         let clickedItem = mouse.itemUnderMouse();
 
         if (clickedItem)
@@ -226,6 +239,8 @@
         mouse.dragSelect = false;
     },
 
+    buildableColor: "rgba(0,0,255,0.3)",
+    unbuildableColor: "rgba(255,0,0,0.3)",
     draw: function ()
     {
         // If the player is dragging and selecting, draw a white box to mark the selection area
@@ -240,6 +255,26 @@
             game.foregroundContext.strokeStyle = "white";
             game.foregroundContext.strokeRect(x - game.offsetX, y - game.offsetY, width, height);
         }
+
+        if (mouse.insideCanvas && sidebar.deployBuilding && sidebar.placementGrid)
+        {
+            let x = (this.gridX * game.gridSize) - game.offsetX;
+            let y = (this.gridY * game.gridSize) - game.offsetY;
+
+            for (let i = sidebar.placementGrid.length - 1; i >= 0; i--)
+            {
+                for (let j = sidebar.placementGrid[i].length - 1; j >= 0; j--)
+                {
+                    let tile = sidebar.placementGrid[i][j];
+
+                    if (tile)
+                    {
+                        game.foregroundContext.fillStyle = (tile === 1) ? this.buildableColor : this.unbuildableColor;
+                        game.foregroundContext.fillRect(x + j * game.gridSize, y + i * game.gridSize, game.gridSize, game.gridSize);
+                    }
+                }
+            }
+        }
     },
 
     mouserightclickhandler: function (ev)
@@ -253,6 +288,14 @@
     // Called whenever player completes a right click on the game canvas
     rightClick: function ()
     {
+        // If the game is in deployBuilding mode, right clicking will cancel deployBuilding mode
+        if (sidebar.deployBuilding)
+        {
+            sidebar.cancelDeployingBuilding();
+
+            return;
+        }
+
         let clickedItem = mouse.itemUnderMouse();
 
         // Handle actions like attacking and movement of selected units

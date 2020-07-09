@@ -253,6 +253,16 @@ var baseItem = {
         }
 
         this.drawSprite();
+
+        if (this.brightness)
+        {
+            let x = this.drawingX + this.pixelOffsetX;
+            let y = this.drawingY + this.pixelOffsetY - (this.pixelShadowHeight ? this.pixelShadowHeight : 0);
+            game.foregroundContext.beginPath();
+            game.foregroundContext.arc(x, y, this.radius, 0, Math.PI * 2, false);
+            game.foregroundContext.fillStyle = "rgba(255,255,255," + this.brightness + ")";
+            game.foregroundContext.fill();
+        }
     },
 
     /* Selection related properties */

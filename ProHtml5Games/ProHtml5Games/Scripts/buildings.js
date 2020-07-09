@@ -41,6 +41,30 @@
                 { name: "damaged", count: 1 },
                 { name: "constructing", count: 3 }
             ],
+
+            processOrders: function ()
+            {
+                switch (this.orders.type)
+                {
+                    case "construct-building":
+                        this.action = "construct";
+                        this.animationIndex = 0;
+
+                        // Teleport in building and subtract the cost from player cash
+                        var itemDetails = this.orders.details;
+
+                        itemDetails.team = this.team;
+                        itemDetails.action = "teleport";
+
+                        var item = game.add(itemDetails);
+
+                        game.cash[this.team] -= item.cost;
+
+                        this.orders = { type: "stand" };
+
+                        break;
+                }
+            }
         },
 
         "starport": {
@@ -71,6 +95,84 @@
                 { name: "healthy", count: 4 },
                 { name: "damaged", count: 1 }
             ],
+
+            isUnitOnTop: function ()
+            {
+                let unitOnTop = false;
+
+                for (let i = game.items.length - 1; i >= 0; i--)
+                {
+                    let item = game.items[i];
+
+                    if (item.type === "vehicles" || item.type === "aircraft")
+                    {
+                        if (item.x > this.x && item.x < this.x + 2 && item.y > this.y && item.y < this.y + 3)
+                        {
+                            unitOnTop = true;
+                            break;
+                        }
+                    }
+                }
+
+                return unitOnTop;
+            },
+
+            processOrders: function ()
+            {
+                switch (this.orders.type)
+                {
+                    case "construct-unit":
+                        if (this.lifeCode !== "healthy")
+                        {
+                            // If the building isn't healthy, ignore the order
+                            this.orders = { type: "stand" };
+                            break;
+                        }
+
+
+                        var unitOnTop = this.isUnitOnTop();
+                        var cost = window[this.orders.details.type].list[this.orders.details.name].cost;
+                        var cash = game.cash[this.team];
+
+                        if (unitOnTop)
+                        {
+                            // Check whether there is a unit standing on top of the building
+                            if (this.team === game.team)
+                            {
+                                game.showMessage("system", "Warning! Cannot teleport unit while landing bay is occupied.");
+                            }
+
+                        } else if (cash < cost)
+                        {
+                            // Check whether player has insufficient cash
+                            if (this.team === game.team)
+                            {
+                                game.showMessage("system", "Warning! Insufficient Funds. Need " + cost + " credits.");
+                            }
+                        } else
+                        {
+                            this.action = "open";
+                            this.animationIndex = 0;
+
+                            let itemDetails = Object.assign({}, this.orders.details);
+
+                            // Position new unit above center of starport
+                            itemDetails.x = this.x + 0.5 * this.pixelWidth / game.gridSize;
+                            itemDetails.y = this.y + 0.5 * this.pixelHeight / game.gridSize;
+
+                            // Subtract the cost from player cash
+                            game.cash[this.team] -= cost;
+
+                            // Set unit to be teleported in once it is constructed
+                            itemDetails.action = "teleport";
+                            itemDetails.team = this.team;
+                            this.constructUnit = itemDetails;
+                        }
+
+                        this.orders = { type: "stand" };
+                        break;
+                }
+            }
         },
 
         "harvester": {
@@ -214,6 +316,13 @@
                     {
                         this.animationIndex = 0;
                         this.action = "close";
+
+                        // If constructUnit has been set, add the new unit to the game
+                        if (this.constructUnit)
+                        {
+                            game.add(this.constructUnit);
+                            this.constructUnit = undefined;
+                        }
                     }
 
                     break;
@@ -223,14 +332,32 @@
                     this.imageOffset = this.imageList.offset + this.animationIndex;
                     this.animationIndex++;
 
-                    // Once deploying is complete, go to stand
+                    // Once deploying is complete, go to harvest
                     if (this.animationIndex >= this.imageList.count)
                     {
                         this.animationIndex = 0;
-                        this.action = "stand";
+                        this.action = "harvest";
                     }
 
                     break;
+
+                case "harvest":
+                    this.imageList = this.spriteArray[this.lifeCode];
+                    this.imageOffset = this.imageList.offset + this.animationIndex;
+                    this.animationIndex++;
+
+                    if (this.animationIndex >= this.imageList.count)
+                    {
+                        this.animationIndex = 0;
+                        if (this.lifeCode === "healthy")
+                        {
+                            // Harvesters mine 2 credits of cash per animation cycle
+                            game.cash[this.team] += 2;
+                        }
+                    }
+
+                    break;
+
             }
         },
 

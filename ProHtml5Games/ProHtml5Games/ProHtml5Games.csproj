@@ -191,6 +191,7 @@
     <Content Include="Scripts\game_mobile.js" />
     <Content Include="Scripts\levels.js" />
     <Content Include="Scripts\mouse.js" />
+    <Content Include="Scripts\sidebar.js" />
     <Content Include="Scripts\singleplayer.js" />
     <Content Include="Scripts\terrain.js" />
     <Content Include="Scripts\vehicles.js" />
