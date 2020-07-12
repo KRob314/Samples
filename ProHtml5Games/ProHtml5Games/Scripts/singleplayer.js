@@ -29,6 +29,8 @@
 
         game.loadLevelData(level);
 
+        fog.initLevel();
+
         // Set player starting location
         game.offsetX = level.startX * game.gridSize;
         game.offsetY = level.startY * game.gridSize;

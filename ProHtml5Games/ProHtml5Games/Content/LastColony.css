@@ -79,6 +79,8 @@ input[type="button"] { border-width: 0; outline: none; background-color: transpa
 #wraith { background-position: -74px -364px; top: 159px; right: 0; }
     #wraith:active, #wraith:disabled { background-position: -278px -364px; }
 
+#skull { top: 55px; right: 0px; background-position: -140px -247px; }
+
 /* Message Box Screen */
 #messageboxscreen { background: rgba(0, 0, 0, 0.7); z-index: 10; }
 #messagebox { /* Center the message box within screen */ position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); transform-origin: center center; width: 296px; height: 178px; background: url("/images/screens/messagebox.png") no-repeat center; color: rgb(130, 150, 162); overflow: hidden; font-size: 13px; font-family: "Courier New", Courier, monospace; }

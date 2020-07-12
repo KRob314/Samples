@@ -7,9 +7,15 @@
         loader.init();
         mouse.init();
         sidebar.init();
+        sounds.init();
 
         // Initialize and store contexts for both the canvases
         game.initCanvases();
+
+        if (window.wAudio)
+        {
+            wAudio.mobileAutoEnable = true;
+        }
 
         // Display the main game menu
         game.hideScreens();
@@ -133,7 +139,6 @@
         game.cash = Object.assign({}, level.cash);
 
         sidebar.initRequirementsForLevel();
-
     },
 
     start: function ()
@@ -191,6 +196,8 @@
             return a.y - b.y + ((a.y === b.y) ? (b.x - a.x) : 0);
         });
 
+        fog.animate();
+
         // Save the time that the last animation loop completed
         game.lastAnimationTime = Date.now();
     },
@@ -234,6 +241,17 @@
             item.draw();
         });
 
+        // Draw exploding bullets on top of everything else
+        game.bullets.forEach(function (bullet)
+        {
+            if (bullet.action === "explode")
+            {
+                bullet.draw();
+            }
+        });
+
+        fog.draw();
+
         // Draw the mouse
         mouse.draw();
 
@@ -275,7 +293,7 @@
     },
 
     // Distance from edge of canvas at which panning starts
-    panningThreshold: 80,
+    panningThreshold: 20,
     // The maximum distance to pan in a single drawing loop
     maximumPanDistance: 10,
 
@@ -353,6 +371,8 @@
 
         // Track items that have been selected by the player
         game.selectedItems = [];
+
+        game.bullets = [];
     },
 
     add: function (itemDetails)
@@ -375,6 +395,11 @@
         if (item.type === "buildings" || item.type === "terrain")
         {
             game.currentMapPassableGrid = undefined;
+        }
+
+        if (item.type === "bullets")
+        {
+            sounds.play(item.name);
         }
 
         return item;
@@ -591,10 +616,24 @@
             "name": "System Control",
             "image": "system.png"
         },
+        "op": {
+            "name": "Operator",
+            "image": "girl3.jpg"
+        },
+        "pilot": {
+            "name": "Pilot",
+            "image": "girl3.jpg"
+        },
+        "driver": {
+            "name": "Driver",
+            "image": "male3.jpg"
+        }
     },
 
     showMessage: function (from, message)
     {
+        sounds.play("message-received");
+
         let callerpicture = document.getElementById("callerpicture");
         let gamemessages = document.getElementById("gamemessages");
 
@@ -798,6 +837,13 @@
 
         game.running = false;
     },
+
+    isItemDead: function (uid)
+    {
+        let item = game.getItemByUid(uid);
+
+        return !item || item.lifeCode === "dead";
+    }
 
 };
 

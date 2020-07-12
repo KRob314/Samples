@@ -8,6 +8,24 @@
 
         Array.prototype.forEach.call(buttons, function (button)
         {
+            var buttonTitle;
+
+            if (vehicles.list[button.id] !== undefined)
+            {
+                buttonTitle = button.id + ' ' + vehicles.list[button.id].cost;
+            }
+            else if (aircraft.list[button.id] !== undefined)
+            {
+                buttonTitle = button.id + ' ' + aircraft.list[button.id].cost;
+            }
+            else if (buildings.list[button.id] !== undefined)
+            {
+                buttonTitle = button.id + ' ' + buildings.list[button.id].cost;
+            }
+
+            button.setAttribute('title', buttonTitle);
+            //button.setAttribute('title', sidebar.constructables[button.id].cost);
+
             button.addEventListener("click", function ()
             {
                 // The input button id is the name of the object that needs to be constructed
@@ -173,6 +191,7 @@
                     // Check whether the tile is inside the map and buildable
                     if (mouse.gridY + y >= game.currentMap.mapGridHeight
                         || mouse.gridX + x >= game.currentMap.mapGridWidth
+                        || fog.grid[game.team][mouse.gridY + y][mouse.gridX + x]
                         || game.currentMapBuildableGrid[mouse.gridY + y][mouse.gridX + x])
                     {
                         // Otherwise mark tile as unbuildable

@@ -49,7 +49,7 @@
 
         game.showScreen("loadingscreen");
 
-        var audio = new Audio();
+        var audio = new (window.wAudio || Audio)();
 
         audio.addEventListener("canplaythrough", loader.itemLoaded, false);
         audio.src = url + loader.soundFileExtn;
@@ -97,6 +97,7 @@ function loadItem(name)
     {
         return;
     }
+    //console.log(name);
 
     item.spriteSheet = loader.loadImage("images/" + this.defaults.type + "/" + name + ".png");
     item.spriteArray = [];
@@ -136,6 +137,12 @@ function loadItem(name)
             item.spriteCount += constructImageCount;
         }
     });
+
+    // Load the weapon if item has one
+    if (item.weaponType)
+    {
+        bullets.load(item.weaponType);
+    }
 }
 
 // Polyfill for a few browsers that still do not support Object.assign
@@ -254,10 +261,12 @@ var baseItem = {
 
         this.drawSprite();
 
+        // Draw a glow around unit while teleporting in
         if (this.brightness)
         {
             let x = this.drawingX + this.pixelOffsetX;
             let y = this.drawingY + this.pixelOffsetY - (this.pixelShadowHeight ? this.pixelShadowHeight : 0);
+
             game.foregroundContext.beginPath();
             game.foregroundContext.arc(x, y, this.radius, 0, Math.PI * 2, false);
             game.foregroundContext.fillStyle = "rgba(255,255,255," + this.brightness + ")";
@@ -346,6 +355,99 @@ var baseItem = {
         {
             this.direction = newDirection;
             this.turning = false;
+        }
+    },
+
+    // Finds the angle from center of source to a target in terms of a direction (0 <= angle < directions)
+    findAngleForFiring: function (target)
+    {
+        var dy = target.y - this.y;
+        var dx = target.x - this.x;
+
+        // Adjust dx and dy to point towards center of target
+        if (target.type === "buildings")
+        {
+            dy += target.baseWidth / 2 / game.gridSize;
+            dx += target.baseHeight / 2 / game.gridSize;
+        } else if (target.type === "aircraft")
+        {
+            dy -= target.pixelShadowHeight / game.gridSize;
+        }
+
+        // Adjust dx and dy to start from center of source
+        if (this.type === "buildings")
+        {
+            dy -= this.baseWidth / 2 / game.gridSize;
+            dx -= this.baseHeight / 2 / game.gridSize;
+        } else if (this.type === "aircraft")
+        {
+            dy += this.pixelShadowHeight / game.gridSize;
+        }
+
+        // Convert arctan to value between (0 - directions)
+        var angle = this.directions / 2 - (Math.atan2(dx, dy) * this.directions / (2 * Math.PI));
+
+        angle = (angle + this.directions) % this.directions;
+
+        return angle;
+    },
+
+    isValidTarget: function (item)
+    {
+        // Cannot target units that are dead or from the same team
+        if (!item || item.lifeCode === "dead" || item.team === this.team)
+        {
+            return false;
+        }
+
+        if (item.type === "buildings" || item.type === "vehicles")
+        {
+            return this.canAttackLand;
+        } else if (item.type === "aircraft")
+        {
+            return this.canAttackAir;
+        }
+
+    },
+
+    isTargetInSight: function (item, sightBonus = 0)
+    {
+        return Math.pow(item.x - this.x, 2) + Math.pow(item.y - this.y, 2)
+            < Math.pow(this.sight + sightBonus, 2);
+    },
+
+    findTargetsInSight: function (sightBonus = 0)
+    {
+        var targets = [];
+
+        game.items.forEach(function (item)
+        {
+            if (this.isValidTarget(item) && this.isTargetInSight(item, sightBonus))
+            {
+                targets.push(item);
+            }
+        }, this);
+
+        // Sort targets based on distance from attacker
+        var attacker = this;
+
+        targets.sort(function (a, b)
+        {
+            return (Math.pow(a.x - attacker.x, 2) + Math.pow(a.y - attacker.y, 2)) - (Math.pow(b.x - attacker.x, 2) + Math.pow(b.y - attacker.y, 2));
+        });
+
+        return targets;
+    },
+
+    // Get back to the previous order if any, otherwise just stand
+    cancelCurrentOrder: function ()
+    {
+        if (this.orders.previousOrder)
+        {
+            this.orders = this.orders.previousOrder;
+        } else
+        {
+            this.orders = { type: "stand" };
         }
     },
 

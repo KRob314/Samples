@@ -129,7 +129,6 @@
                             break;
                         }
 
-
                         var unitOnTop = this.isUnitOnTop();
                         var cost = window[this.orders.details.type].list[this.orders.details.name].cost;
                         var cash = game.cash[this.team];
@@ -230,6 +229,71 @@
                 { name: "healthy", count: 1, directions: 8 },
                 { name: "damaged", count: 1 }
             ],
+
+            turnSpeed: 1,
+            processOrders: function ()
+            {
+                if (this.reloadTimeLeft)
+                {
+                    this.reloadTimeLeft--;
+                }
+
+                // Damaged turret cannot do anything
+                if (this.lifeCode !== "healthy")
+                {
+                    return;
+                }
+
+                var targets;
+
+                switch (this.orders.type)
+                {
+                    case "guard":
+                        targets = this.findTargetsInSight();
+
+                        if (targets.length > 0)
+                        {
+                            this.orders = { type: "attack", to: targets[0] };
+                        }
+
+                        break;
+
+                    case "attack":
+                        // If the current target is no longer valid, go back to guarding
+                        if (!this.isValidTarget(this.orders.to) || !this.isTargetInSight(this.orders.to))
+                        {
+                            this.orders = { type: "guard" };
+                            break;
+                        }
+
+                        var targetDirection = this.findAngleForFiring(this.orders.to);
+
+                        // Turn towards target direction if necessary
+                        this.turnTo(targetDirection);
+
+                        // Check if turret has finished turning
+                        if (!this.turning)
+                        {
+                            // Check if weapon has finished reloading
+                            if (!this.reloadTimeLeft)
+                            {
+
+                                // Calculate the starting position of the bullet
+                                let angleRadians = -(targetDirection / this.directions) * 2 * Math.PI;
+                                let bulletX = this.x + 0.5 - (1 * Math.sin(angleRadians));
+                                let bulletY = this.y + 0.5 - (1 * Math.cos(angleRadians));
+
+                                // Fire the bullet
+                                game.add({ name: this.weaponType, type: "bullets", x: bulletX, y: bulletY, direction: targetDirection, target: this.orders.to });
+
+                                // Set the weapon reloading cooldown
+                                this.reloadTimeLeft = bullets.list[this.weaponType].reloadTime;
+                            }
+                        }
+
+                        break;
+                }
+            }
         }
     },
 

@@ -128,6 +128,10 @@
     <Content Include="Images\buttons.png" />
     <Content Include="Images\characters\girl1.png" />
     <Content Include="Images\characters\girl2.png" />
+    <Content Include="Images\characters\girl3.jpg" />
+    <Content Include="Images\characters\girl4.jpg" />
+    <Content Include="Images\characters\girl5.jpg" />
+    <Content Include="Images\characters\male3.jpg" />
     <Content Include="Images\characters\man1.png" />
     <Content Include="Images\characters\system.png" />
     <Content Include="Images\entities\apple.png" />
@@ -185,7 +189,9 @@
     <Content Include="Scripts\Box2d.js" />
     <Content Include="Scripts\Box2d.min.js" />
     <Content Include="Scripts\buildings.js" />
+    <Content Include="Scripts\bullets.js" />
     <Content Include="Scripts\common.js" />
+    <Content Include="Scripts\fog.js" />
     <Content Include="Scripts\game.js" />
     <Content Include="Scripts\game_lastColony.js" />
     <Content Include="Scripts\game_mobile.js" />
@@ -193,6 +199,7 @@
     <Content Include="Scripts\mouse.js" />
     <Content Include="Scripts\sidebar.js" />
     <Content Include="Scripts\singleplayer.js" />
+    <Content Include="Scripts\sounds.js" />
     <Content Include="Scripts\terrain.js" />
     <Content Include="Scripts\vehicles.js" />
     <Content Include="Scripts\wAudio.js" />

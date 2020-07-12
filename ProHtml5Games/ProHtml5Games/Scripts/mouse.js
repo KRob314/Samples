@@ -14,6 +14,10 @@
 
         canvas.addEventListener("contextmenu", mouse.mouserightclickhandler, false);
 
+        canvas.addEventListener("touchstart", mouse.touchstarthandler, { passive: false });
+        canvas.addEventListener("touchend", mouse.touchendhandler, { passive: false });
+        canvas.addEventListener("touchmove", mouse.touchmovehandler, { passive: false });
+
         mouse.canvas = canvas;
     },
 
@@ -28,6 +32,9 @@
     // game grid x,y coordinates of mouse
     gridX: 0,
     gridY: 0,
+
+    doubleTapTimeoutThreshold: 300,
+    doubleTapTimeout: undefined,
 
     calculateGameCoordinates: function ()
     {
@@ -139,6 +146,13 @@
     // Return the first item detected under the mouse.
     itemUnderMouse: function ()
     {
+        // If the mouse is over fog, don't detect any items
+        if (fog.isPointOverFog(mouse.gameX, mouse.gameY))
+        {
+            return;
+        }
+
+
         for (let i = game.items.length - 1; i >= 0; i--)
         {
             let item = game.items[i];
@@ -320,6 +334,7 @@
                     if (uids.length > 0)
                     {
                         game.sendCommand(uids, { type: "attack", toUid: clickedItem.uid });
+                        sounds.play("acknowledge-attacking");
                     }
                 } else
                 { // Player right-clicked on a friendly item
@@ -338,6 +353,7 @@
                     if (uids.length > 0)
                     {
                         game.sendCommand(uids, { type: "guard", toUid: clickedItem.uid });
+                        sounds.play("acknowledge-moving");
                     }
 
                 }
@@ -361,6 +377,7 @@
                 if (uids.length > 0)
                 {
                     game.sendCommand(uids, { type: "deploy", toUid: clickedItem.uid });
+                    sounds.play("acknowledge-moving");
                 }
             }
         } else
@@ -380,7 +397,60 @@
             if (uids.length > 0)
             {
                 game.sendCommand(uids, { type: "move", to: { x: mouse.gameX / game.gridSize, y: mouse.gameY / game.gridSize } });
+                sounds.play("acknowledge-moving");
             }
         }
+    },
+
+    touchstarthandler: function (ev)
+    {
+        mouse.insideCanvas = true;
+        let touch = event.targetTouches[0];
+        mouse.setCoordinates(touch.clientX, touch.clientY);
+        mouse.buttonPressed = true;
+        mouse.dragX = mouse.gameX;
+        mouse.dragY = mouse.gameY;
+        ev.preventDefault();
+    },
+
+    touchmovehandler: function (ev)
+    {
+        mouse.insideCanvas = true;
+        let touch = ev.targetTouches[0];
+        mouse.setCoordinates(touch.clientX, touch.clientY);
+        mouse.checkIfDragging();
+        ev.preventDefault();
+    },
+
+    touchendhandler: function (ev)
+    {
+        // While a typical touch device isn't likely to have a keyboard, leave this just in case
+        let shiftPressed = ev.shiftKey;
+        if (mouse.dragSelect)
+        {
+            // If currently drag-selecting, attempt to select items with the selection rectangle
+            mouse.finishDragSelection(shiftPressed);
+        } else
+        {
+            // If not dragging, wait for threshold before treating it as a left-click
+            if (!mouse.doubleTapTimeout)
+            {
+                mouse.doubleTapTimeout = setTimeout(function ()
+                {
+                    mouse.doubleTapTimeout = undefined;
+                    mouse.leftClick();
+                }, mouse.doubleTapTimeoutThreshold);
+            } else
+            {
+                // If a second tap occurs before timeout, treat it as a double-tap(our approximation of a right - click)
+                clearTimeout(mouse.doubleTapTimeout);
+                mouse.doubleTapTimeout = undefined;
+                mouse.rightClick();
+            }
+        }
+        mouse.buttonPressed = false;
+        // When a touch event ends, act as if the mouse has left the canvas
+        mouse.insideCanvas = false;
+        ev.preventDefault();
     },
 };

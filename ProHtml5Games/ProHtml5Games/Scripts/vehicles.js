@@ -185,6 +185,13 @@
                 var radius = this.radius / game.gridSize;
             }
 
+            if (this.reloadTimeLeft)
+            {
+                this.reloadTimeLeft--;
+            }
+
+            var targets;
+
             switch (this.orders.type)
             {
                 case "move":
@@ -273,6 +280,133 @@
                         {
                             this.orders = { type: "stand" };
                         }
+                    }
+
+                    break;
+
+                case "stand":
+                    // Look for targets that are within sight range
+                    targets = this.findTargetsInSight();
+
+                    if (targets.length > 0)
+                    {
+                        this.orders = { type: "attack", to: targets[0] };
+                    }
+
+                    break;
+
+                case "sentry":
+                    // Look for targets upto 2 squares beyond sight range
+                    targets = this.findTargetsInSight(2);
+
+                    if (targets.length > 0)
+                    {
+                        this.orders = { type: "attack", to: targets[0], previousOrder: this.orders };
+                    }
+
+                    break;
+
+                case "hunt":
+                    // Look for targets anywhere on the map
+                    targets = this.findTargetsInSight(100);
+
+                    if (targets.length > 0)
+                    {
+                        this.orders = { type: "attack", to: targets[0], previousOrder: this.orders };
+                    }
+
+                    break;
+
+                case "attack":
+                    // If the target is no longer valid, cancel the current order
+                    if (!this.isValidTarget(this.orders.to))
+                    {
+                        this.cancelCurrentOrder();
+                        break;
+                    }
+
+                    // Check if vehicle is within sight range of target
+                    if (this.isTargetInSight(this.orders.to))
+                    {
+                        // Turn toward target and then start attacking when within range of the target
+                        var targetDirection = this.findAngleForFiring(this.orders.to);
+
+                        // Turn towards target direction if necessary
+                        this.turnTo(targetDirection);
+
+                        // Check if vehicle has finished turning
+                        if (!this.turning)
+                        {
+                            // If reloading has completed, fire bullet
+                            if (!this.reloadTimeLeft)
+                            {
+                                this.reloadTimeLeft = bullets.list[this.weaponType].reloadTime;
+                                var angleRadians = -(targetDirection / this.directions) * 2 * Math.PI;
+                                var bulletX = this.x - (this.radius * Math.sin(angleRadians) / game.gridSize);
+                                var bulletY = this.y - (this.radius * Math.cos(angleRadians) / game.gridSize);
+
+                                game.add({ name: this.weaponType, type: "bullets", x: bulletX, y: bulletY, direction: targetDirection, target: this.orders.to });
+                            }
+                        }
+
+                    } else
+                    {
+                        // Move towards the target
+                        this.moveTo(this.orders.to, distanceFromDestination);
+                    }
+
+                    break;
+
+                case "patrol":
+                    targets = this.findTargetsInSight(1);
+
+                    if (targets.length > 0)
+                    {
+                        // Attack the target, but save the patrol order as previousOrder
+                        this.orders = { type: "attack", to: targets[0], previousOrder: this.orders };
+                        break;
+                    }
+
+                    // Move toward destination until it is inside of sight range
+                    if (distanceFromDestination < this.sight)
+                    {
+                        // Swap to and from locations
+                        var to = this.orders.to;
+
+                        this.orders.to = this.orders.from;
+                        this.orders.from = to;
+
+                    } else
+                    {
+                        // Move towards the next destination
+                        this.moveTo(this.orders.to, distanceFromDestination);
+                    }
+
+                    break;
+
+                case "guard":
+                    // If the item being guarded is dead, cancel the current order
+                    if (this.orders.to.lifeCode === "dead")
+                    {
+                        this.cancelCurrentOrder();
+                        break;
+                    }
+
+                    // If the target is inside of sight range
+                    if (distanceFromDestination < this.sight)
+                    {
+                        // Find any enemies near
+                        targets = this.findTargetsInSight(1);
+                        if (targets.length > 0)
+                        {
+                            // Attack the nearest target, but save the guard order as previousOrder
+                            this.orders = { type: "attack", to: targets[0], previousOrder: this.orders };
+                            break;
+                        }
+                    } else
+                    {
+                        // Move towards the target
+                        this.moveTo(this.orders.to, distanceFromDestination);
                     }
 
                     break;
