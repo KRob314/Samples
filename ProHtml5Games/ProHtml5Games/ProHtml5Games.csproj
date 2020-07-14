@@ -197,12 +197,14 @@
     <Content Include="Scripts\game_mobile.js" />
     <Content Include="Scripts\levels.js" />
     <Content Include="Scripts\mouse.js" />
+    <Content Include="Scripts\multiplayer.js" />
     <Content Include="Scripts\sidebar.js" />
     <Content Include="Scripts\singleplayer.js" />
     <Content Include="Scripts\sounds.js" />
     <Content Include="Scripts\terrain.js" />
     <Content Include="Scripts\vehicles.js" />
     <Content Include="Scripts\wAudio.js" />
+    <Content Include="server\server.js" />
     <Content Include="Web.config" />
     <Content Include="WebAudioExample.html" />
   </ItemGroup>
@@ -214,6 +216,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <Content Include="server\package.json" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -89,3 +89,19 @@ input[type="button"] { border-width: 0; outline: none; background-color: transpa
     #messageboxok:active, #messageboxok:disabled { background-position: -82px -122px; }
 #messageboxcancel { position: absolute; left: 197px; top: 130px; width: 73px; height: 24px; background-position: -4px -154px; }
     #messageboxcancel:active, #messageboxcancel:disabled { background-position: -82px -154px; }
+
+/* Multiplayer Lobby Screen */
+#multiplayerlobbyscreen { background: url("/images/screens/multiplayerlobby.png") no-repeat center; text-align: center; }
+#multiplayergameslist { /* Center on the screen */ position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); transform-origin: center center; width: 394px; height: 274px; /* Hide scrollbar and border effects */ overflow: hidden; border: none; outline: none; /* Translucent gray background */ background: rgba(0, 0, 0, 0.5); /* Format Text */ color: lightblue; font-size: 14px; font-family: "Courier New", Courier, monospace; padding: 20px; text-align: left; }
+/* Styles for Join and Cancel buttons */
+#multiplayerlobbyscreen input[type="button"] { position: relative; top: 410px; width: 74px; height: 26px; }
+#multiplayerjoin { left: -225px; background-position: -4px -186px; }
+    #multiplayerjoin:active, #multiplayerjoin:disabled { background-position: -82px -186px; }
+#multiplayercancel { background-position: -4px -154px; left: 225px; }
+    #multiplayercancel:active, #multiplayercancel:disabled { background-position: -82px -154px; }
+/* Styles for different game room statuses */
+tr { cursor: pointer; }
+.selected { background-color: #274466; }
+.running, .starting { background-color: #444444; color: #666666; cursor: not-allowed; }
+.waiting { color: lightgreen; }
+.empty { color: lightblue; }

@@ -12,10 +12,12 @@
         // Initialize and store contexts for both the canvases
         game.initCanvases();
 
+        // If wAudio has been added, automatically enable mobile audio on the first user touch event
         if (window.wAudio)
         {
             wAudio.mobileAutoEnable = true;
         }
+
 
         // Display the main game menu
         game.hideScreens();
@@ -293,7 +295,7 @@
     },
 
     // Distance from edge of canvas at which panning starts
-    panningThreshold: 20,
+    panningThreshold: 80,
     // The maximum distance to pan in a single drawing loop
     maximumPanDistance: 10,
 
@@ -397,6 +399,7 @@
             game.currentMapPassableGrid = undefined;
         }
 
+        // Play bullet firing sound when a bullet is created
         if (item.type === "bullets")
         {
             sounds.play(item.name);
@@ -506,12 +509,16 @@
     // Receive command from singleplayer or multiplayer object and send it to units
     processCommand: function (uids, details)
     {
+        console.log('process command');
+        console.log(uids);
+        console.log(details);
         // In case the target "to" object is in terms of uid, fetch the target object
         var toObject;
 
         if (details.toUid)
         {
             toObject = game.getItemByUid(details.toUid);
+
             if (!toObject || toObject.lifeCode === "dead")
             {
                 // To object no longer exists. Invalid command
@@ -522,7 +529,7 @@
         uids.forEach(function (uid)
         {
             let item = game.getItemByUid(uid);
-
+            console.log(item);
             // If uid is for a valid item, set the order for the item
             if (item)
             {
@@ -618,20 +625,21 @@
         },
         "op": {
             "name": "Operator",
-            "image": "girl3.jpg"
+            "image": "girl1.png"
         },
         "pilot": {
             "name": "Pilot",
-            "image": "girl3.jpg"
+            "image": "girl2.png"
         },
         "driver": {
             "name": "Driver",
-            "image": "male3.jpg"
+            "image": "man1.png"
         }
     },
 
     showMessage: function (from, message)
     {
+
         sounds.play("message-received");
 
         let callerpicture = document.getElementById("callerpicture");

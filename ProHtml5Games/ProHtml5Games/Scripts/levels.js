@@ -598,6 +598,54 @@ var levels = {
     ],
 
     "multiplayer": [
+        {
+            /* Map Details */
+            "mapName": "plains",
+
+            /* Entities to be loaded */
+            "requirements": {
+                "buildings": ["base", "harvester", "starport", "ground-turret"],
+                "vehicles": ["transport", "scout-tank", "heavy-tank", "harvester"],
+                "aircraft": ["wraith", "chopper"],
+                "terrain": ["oilfield"]
+            },
+
+            /* Starting Cash */
+            "cash": {
+                "blue": 3000,
+                "green": 3000
+            },
+
+            /* Entities to be added */
+            "items": [
+                { "type": "terrain", "name": "oilfield", "x": 16, "y": 4, "action": "hint" },
+                { "type": "terrain", "name": "oilfield", "x": 34, "y": 12, "action": "hint" },
+                { "type": "terrain", "name": "oilfield", "x": 1, "y": 30, "action": "hint" },
+                { "type": "terrain", "name": "oilfield", "x": 38, "y": 38, "action": "hint" },
+            ],
+
+            /* Entities for each starting team */
+            "teamStartingItems": [
+                { "type": "buildings", "name": "base", "x": 0, "y": 0 },
+                { "type": "vehicles", "name": "harvester", "x": 4, "y": 0 },
+                { "type": "vehicles", "name": "heavy-tank", "x": 4, "y": 2 },
+                { "type": "vehicles", "name": "scout-tank", "x": 6, "y": 0 },
+                { "type": "vehicles", "name": "scout-tank", "x": 6, "y": 2 },
+            ],
+
+            /* Possible starting spawn locations for the players */
+            "spawnLocations": [
+                { "x": 48, "y": 36, "startX": 36, "startY": 20 },
+                { "x": 3, "y": 36, "startX": 0, "startY": 20 },
+                { "x": 36, "y": 3, "startX": 32, "startY": 0 },
+                { "x": 3, "y": 3, "startX": 0, "startY": 0 },
+            ],
+
+            /* Conditional and Timed Trigger Events */
+            "triggers": [
+            ]
+
+        }
 
     ]
 };
