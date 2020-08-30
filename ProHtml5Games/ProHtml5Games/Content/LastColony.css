@@ -55,6 +55,9 @@ input[type="button"] { border-width: 0; outline: none; background-color: transpa
 #gameinterfacescreen canvas { position: absolute; top: 79px; left: 0; }
 
 /* Sidebar Buttons */
+#sidebarbuttons_breif { position: absolute; right: -15px; top: 75px; width: 130px; height: 214px; padding: 0; margin: 0; overflow: hidden; }
+    #sidebarbuttons_breif input[type="button"] { width: 64px; height: 54px; padding: 0; margin: 0; background-color: transparent; position: absolute; }
+
 #sidebarbuttons { position: absolute; right: 12px; top: 265px; width: 130px; height: 214px; padding: 0; margin: 0; overflow: hidden; }
     #sidebarbuttons input[type="button"] { width: 64px; height: 54px; padding: 0; margin: 0; background-color: transparent; position: absolute; }
 /* Starport Button */
@@ -105,3 +108,6 @@ tr { cursor: pointer; }
 .running, .starting { background-color: #444444; color: #666666; cursor: not-allowed; }
 .waiting { color: lightgreen; }
 .empty { color: lightblue; }
+
+#chatmessage { position: absolute; top: 460px; background: rgba(0, 255, 0, 0.1); color: green; border: 1px solid green; /* Hide chat input by default */ display: none; }
+    #chatmessage:focus { outline: none; }

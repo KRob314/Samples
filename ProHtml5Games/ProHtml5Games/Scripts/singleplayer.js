@@ -47,15 +47,65 @@
         this.showMissionBriefing(level.briefing);
     },
 
+    showItemDescription: function (item)
+    {
+        var description = '';
+
+        switch (item)
+        {
+            case 'starport':
+                description = ' : Used to teleport in both ground vehicles and aircraft';
+                break;
+            case 'ground-turret':
+                description = ' : Defensive structure used to guard against ground vehicles';
+                break;
+            case 'harvester':
+                description = ' : Used to extract resources from oil fields';
+                break;
+            case 'scout-tank':
+                description = ' : A light, fast-moving tank used for scouting';
+                break;
+            case 'heavy-tank':
+                description = ' : A slower tank with heavier armor and weaponry';
+                break;
+            case 'chopper':
+                description = ' : A slow-moving craft that can attack both land and air';
+                break;
+            case 'wraith':
+                description = ' : A fast-moving jet aircraft that can attack only in the air';
+                break;
+
+        }
+
+        return description;
+       // document.getElementById('vehicleDescription').innerHTML = description;
+       
+        
+    },
+
     showMissionBriefing: function (briefing)
     {
         var missionBriefingText = document.getElementById("missionbriefing");
 
+        var vehicleDescription = "";
+
+        var vehicleInfo = '<p id="vehicleDescription" style="width: 70%"> <p> <div id="sidebarbuttons_breif"> \
+            <input type="button" id="starport" title="Starport"  onclick="singleplayer.showItemDescription(1)"> \
+                <input type="button" id="ground-turret" title="Turret" onclick="singleplayer.showItemDescription(2)"> \
+                    <input type="button" id="harvester" title="Harvester" onclick="singleplayer.showItemDescription(3)"> \
+                        <input type="button" id="scout-tank" title="Scout Tank" onclick="singleplayer.showItemDescription(4)"> \
+                            <input type="button" id="heavy-tank" title="Heavy Tank" onclick="singleplayer.showItemDescription(5)"> \
+                                <input type="button" id="chopper" title="Copter" onclick="singleplayer.showItemDescription(6)"> \
+                                    <input type="button" id="wraith" title="Wraith" onclick="singleplayer.showItemDescription(7)"> \
+                </div>';
+
         // Replace \n in briefing text with two <br> to create next paragraph
-        missionBriefingText.innerHTML = briefing.replace(/\n/g, "<br><br>");
+        missionBriefingText.innerHTML = briefing.replace(/\n/g, "<br><br>"); // + vehicleInfo;
 
         // Display the mission briefing screen
         game.showScreen("missionbriefingscreen");
+
+
     },
 
     exit: function ()

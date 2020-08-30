@@ -55,6 +55,9 @@
 
             if (item.team === team && !item.keepFogged)
             {
+                //console.log('fog');
+                //console.log(item);
+
                 var x = Math.floor(item.x);
                 var y = Math.floor(item.y);
                 var x0 = Math.max(0, x - item.sight + 1);

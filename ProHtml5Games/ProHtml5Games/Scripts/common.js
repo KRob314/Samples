@@ -97,7 +97,6 @@ function loadItem(name)
     {
         return;
     }
-    //console.log(name);
 
     item.spriteSheet = loader.loadImage("images/" + this.defaults.type + "/" + name + ".png");
     item.spriteArray = [];

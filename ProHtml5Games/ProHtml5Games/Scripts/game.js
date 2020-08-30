@@ -12,7 +12,8 @@ var b2ContactListener = Box2D.Dynamics.b2ContactListener;
 
 var game = {
     // Start initializing objects, preloading assets and display start screen
-    init: function() {
+    init: function ()
+    {
         // Get handler for game canvas and context
         game.canvas = document.getElementById("gamecanvas");
         game.context = game.canvas.getContext("2d");
@@ -30,30 +31,35 @@ var game = {
         });
     },
 
-    hideScreens: function() {
+    hideScreens: function ()
+    {
         var screens = document.getElementsByClassName("gamelayer");
 
         // Iterate through all the game layers and set their display to none
-        for (let i = screens.length - 1; i >= 0; i--) {
+        for (let i = screens.length - 1; i >= 0; i--)
+        {
             var screen = screens[i];
 
             screen.style.display = "none";
         }
     },
 
-    hideScreen: function(id) {
+    hideScreen: function (id)
+    {
         var screen = document.getElementById(id);
 
         screen.style.display = "none";
     },
 
-    showScreen: function(id) {
+    showScreen: function (id)
+    {
         var screen = document.getElementById(id);
 
         screen.style.display = "block";
     },
 
-    showLevelScreen: function() {
+    showLevelScreen: function ()
+    {
         game.hideScreens();
         game.showScreen("levelselectscreen");
     },
@@ -78,7 +84,8 @@ var game = {
     // X axis offset for panning the screen from left to right
     offsetLeft: 0,
 
-    start: function() {
+    start: function ()
+    {
         game.hideScreens();
 
         // Display the game canvas and score
@@ -102,7 +109,8 @@ var game = {
 
     // Pan the screen so it centers at newCenter
     // (or at least as close as possible)
-    panTo: function(newCenter) {
+    panTo: function (newCenter)
+    {
 
         // Minimum and Maximum panning offset
         var minOffset = 0;
@@ -112,19 +120,22 @@ var game = {
         var currentCenter = game.offsetLeft + game.canvas.width / 2;
 
         // If the distance between new center and current center is > 0 and we have not panned to the min and max offset limits, keep panning
-        if (Math.abs(newCenter - currentCenter) > 0 && game.offsetLeft <= maxOffset && game.offsetLeft >= minOffset) {
+        if (Math.abs(newCenter - currentCenter) > 0 && game.offsetLeft <= maxOffset && game.offsetLeft >= minOffset)
+        {
             // We will travel half the distance from the newCenter to currentCenter in each tick
             // This will allow easing
             var deltaX = (newCenter - currentCenter) / 2;
 
             // However if deltaX is really high, the screen will pan too fast, so if it is greater than maxSpeed
-            if (Math.abs(deltaX) > game.maxSpeed) {
+            if (Math.abs(deltaX) > game.maxSpeed)
+            {
                 // Limit delta x to game.maxSpeed (and keep the sign of deltaX)
                 deltaX = game.maxSpeed * Math.sign(deltaX);
             }
 
             // And if we have almost reached the goal, just get to the ending in this turn
-            if (Math.abs(deltaX) <= 1) {
+            if (Math.abs(deltaX) <= 1)
+            {
                 deltaX = (newCenter - currentCenter);
             }
 
@@ -132,19 +143,22 @@ var game = {
             game.offsetLeft += deltaX;
 
             // And make sure we don't cross the minimum or maximum limits
-            if (game.offsetLeft <= minOffset) {
+            if (game.offsetLeft <= minOffset)
+            {
                 game.offsetLeft = minOffset;
 
                 // Let calling function know that we have panned as close as possible to the newCenter
                 return true;
-            } else if (game.offsetLeft >= maxOffset) {
+            } else if (game.offsetLeft >= maxOffset)
+            {
                 game.offsetLeft = maxOffset;
 
                 // Let calling function know that we have panned as close as possible to the newCenter
                 return true;
             }
 
-        } else {
+        } else
+        {
             // Let calling function know that we have panned as close as possible to the newCenter
             return true;
         }
@@ -386,7 +400,8 @@ var game = {
         // Draw the front of the slingshot, offset by the entire offsetLeft distance
         game.context.drawImage(game.slingshotFrontImage, game.slingshotX - game.offsetLeft, game.slingshotY);
 
-        if (!game.ended) {
+        if (!game.ended)
+        {
             game.animationFrame = window.requestAnimationFrame(game.animate, game.canvas);
         }
     },
@@ -436,7 +451,7 @@ var game = {
 
         if (game.mode === "level-success")
         {
-            if (game.currentLevel.number < levels.data.length -1)
+            if (game.currentLevel.number < levels.data.length - 1)
             {
                 endingMessage.innerHTML = "Level Complete. Well Done!";
                 playNextLevel.style.display = "block";
@@ -540,10 +555,12 @@ var game = {
         };
 
         loader.onload = onload;
-    }, 
+    },
 
     startBackgroundMusic: function ()
     {
+        console.log('musick');
+        console.log(game.backgroundMusic);
         game.backgroundMusic.play();
         game.setBackgroundMusicButton();
     },
@@ -607,6 +624,7 @@ var levels = {
             // The slingshot wooden frame
             { type: "ground", name: "wood", x: 190, y: 390, width: 30, height: 80, isStatic: true },
 
+          
             { type: "block", name: "wood", x: 850, y: 380, angle: 90, width: 100, height: 25 },
             { type: "block", name: "wood", x: 700, y: 380, angle: 90, width: 100, height: 25 },
             { type: "block", name: "wood", x: 550, y: 380, angle: 90, width: 100, height: 25 },
@@ -625,14 +643,50 @@ var levels = {
             { type: "hero", name: "orange", x: 80, y: 405 },
             { type: "hero", name: "apple", x: 140, y: 405 }
         ]
+    },
+    {   // third level
+        foreground: "desert-foreground",
+        background: "clouds-background",
+        entities: [
+            // The ground
+            { type: "ground", name: "dirt", x: 500, y: 440, width: 1000, height: 20, isStatic: true },
+            // The slingshot wooden frame
+            { type: "ground", name: "wood", x: 190, y: 390, width: 30, height: 80, isStatic: true },
+
+            { type: "block", name: "wood", x: 400, y: 380, angle: 90, width: 100, height: 25 },
+            { type: "block", name: "wood", x: 500, y: 380, angle: 90, width: 100, height: 25 },
+            { type: "block", name: "glass", x: 450, y: 316, width: 100, height: 25 },
+
+            { type: "block", name: "wood", x: 850, y: 380, angle: 90, width: 100, height: 25 },
+            { type: "block", name: "wood", x: 700, y: 380, angle: 90, width: 100, height: 25 },
+            { type: "block", name: "wood", x: 550, y: 380, angle: 90, width: 100, height: 25 },
+            { type: "block", name: "glass", x: 625, y: 316, width: 150, height: 25 },
+            { type: "block", name: "glass", x: 775, y: 316, width: 150, height: 25 },
+
+            { type: "block", name: "glass", x: 625, y: 252, angle: 90, width: 100, height: 25 },
+            { type: "block", name: "glass", x: 775, y: 252, angle: 90, width: 100, height: 25 },
+            { type: "block", name: "wood", x: 700, y: 190, width: 150, height: 25 },
+
+            { type: "villain", name: "burger", x: 700, y: 152, calories: 590 },
+            { type: "villain", name: "fries", x: 625, y: 405, calories: 420 },
+            { type: "villain", name: "sodacan", x: 775, y: 400, calories: 150 },
+
+            { type: "hero", name: "strawberry", x: 0, y: 0 },
+            { type: "hero", name: "strawberry", x: 50, y: 0 },
+            { type: "hero", name: "orange", x: 75, y: 0 },
+            { type: "hero", name: "strawberry", x: 100, y: 500 },
+
+        ]
     }],
 
     // Initialize level selection screen
-    init: function() {
+    init: function ()
+    {
         var levelSelectScreen = document.getElementById("levelselectscreen");
 
         // An event handler to call
-        var buttonClickHandler = function() {
+        var buttonClickHandler = function ()
+        {
             game.hideScreen("levelselectscreen");
 
             // Level label values are 1, 2. Levels are 0, 1
@@ -640,7 +694,8 @@ var levels = {
         };
 
 
-        for (let i = 0; i < levels.data.length; i++) {
+        for (let i = 0; i < levels.data.length; i++)
+        {
             var button = document.createElement("input");
 
             button.type = "button";
@@ -653,7 +708,8 @@ var levels = {
     },
 
     // Load all data and images for a specific level
-    load: function(number) {
+    load: function (number)
+    {
 
         box2d.init();
 
@@ -688,16 +744,19 @@ var loader = {
     loadedCount: 0, // Assets that have been loaded so far
     totalCount: 0, // Total number of assets that need loading
 
-    init: function() {
+    init: function ()
+    {
         // check for sound support
         var mp3Support, oggSupport;
         var audio = document.createElement("audio");
 
-        if (audio.canPlayType) {
-               // Currently canPlayType() returns:  "", "maybe" or "probably"
+        if (audio.canPlayType)
+        {
+            // Currently canPlayType() returns:  "", "maybe" or "probably"
             mp3Support = "" !== audio.canPlayType("audio/mpeg");
             oggSupport = "" !== audio.canPlayType("audio/ogg; codecs=\"vorbis\"");
-        } else {
+        } else
+        {
             // The audio tag is not supported
             mp3Support = false;
             oggSupport = false;
@@ -707,7 +766,8 @@ var loader = {
         loader.soundFileExtn = oggSupport ? ".ogg" : mp3Support ? ".mp3" : undefined;
     },
 
-    loadImage: function(url) {
+    loadImage: function (url)
+    {
         this.loaded = false;
         this.totalCount++;
 
@@ -723,7 +783,8 @@ var loader = {
 
     soundFileExtn: ".ogg",
 
-    loadSound: function(url) {
+    loadSound: function (url)
+    {
         this.loaded = false;
         this.totalCount++;
 
@@ -737,7 +798,8 @@ var loader = {
         return audio;
     },
 
-    itemLoaded: function(ev) {
+    itemLoaded: function (ev)
+    {
         // Stop listening for event type (load or canplaythrough) for this item now that it has been loaded
         ev.target.removeEventListener(ev.type, loader.itemLoaded, false);
 
@@ -745,7 +807,8 @@ var loader = {
 
         document.getElementById("loadingmessage").innerHTML = "Loaded " + loader.loadedCount + " of " + loader.totalCount;
 
-        if (loader.loadedCount === loader.totalCount) {
+        if (loader.loadedCount === loader.totalCount)
+        {
             // Loader has loaded completely..
             // Reset and clear the loader
             loader.loaded = true;
@@ -756,7 +819,8 @@ var loader = {
             game.hideScreen("loadingscreen");
 
             // and call the loader.onload method if it exists
-            if (loader.onload) {
+            if (loader.onload)
+            {
                 loader.onload();
                 loader.onload = undefined;
             }
@@ -770,7 +834,8 @@ var mouse = {
     down: false,
     dragging: false,
 
-    init: function() {
+    init: function ()
+    {
         var canvas = document.getElementById("gamecanvas");
 
         canvas.addEventListener("mousemove", mouse.mousemovehandler, false);
@@ -779,26 +844,30 @@ var mouse = {
         canvas.addEventListener("mouseout", mouse.mouseuphandler, false);
     },
 
-    mousemovehandler: function(ev) {
+    mousemovehandler: function (ev)
+    {
         var offset = game.canvas.getBoundingClientRect();
 
         mouse.x = ev.clientX - offset.left;
         mouse.y = ev.clientY - offset.top;
 
-        if (mouse.down) {
+        if (mouse.down)
+        {
             mouse.dragging = true;
         }
 
         ev.preventDefault();
     },
 
-    mousedownhandler: function(ev) {
+    mousedownhandler: function (ev)
+    {
         mouse.down = true;
 
         ev.preventDefault();
     },
 
-    mouseuphandler: function(ev) {
+    mouseuphandler: function (ev)
+    {
         mouse.down = false;
         mouse.dragging = false;
 
@@ -972,7 +1041,7 @@ var box2d =
 
         box2d.world = new b2World(gravity, allowSleep);
 
-        //this.setupDebugDraw();
+        this.setupDebugDraw();
 
         this.handleCollisions();
     },
@@ -1112,6 +1181,7 @@ var box2d =
 };
 
 // Intialize game once page has fully loaded
-window.addEventListener("load", function() {
+window.addEventListener("load", function ()
+{
     game.init();
 });

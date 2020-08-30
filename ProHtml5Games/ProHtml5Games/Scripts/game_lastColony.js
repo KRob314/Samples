@@ -101,6 +101,9 @@
             game.canvasResized = true;
         }
 
+        // Set the chatmessage input to the same value
+        document.getElementById("chatmessage").style.width = canvasWidth + "px";
+
     },
 
     loadLevelData: function (level)
@@ -295,9 +298,9 @@
     },
 
     // Distance from edge of canvas at which panning starts
-    panningThreshold: 80,
+    panningThreshold: 40,
     // The maximum distance to pan in a single drawing loop
-    maximumPanDistance: 10,
+    maximumPanDistance: 5,
 
     handlePanning: function ()
     {
@@ -509,16 +512,12 @@
     // Receive command from singleplayer or multiplayer object and send it to units
     processCommand: function (uids, details)
     {
-        console.log('process command');
-        console.log(uids);
-        console.log(details);
         // In case the target "to" object is in terms of uid, fetch the target object
         var toObject;
 
         if (details.toUid)
         {
             toObject = game.getItemByUid(details.toUid);
-
             if (!toObject || toObject.lifeCode === "dead")
             {
                 // To object no longer exists. Invalid command
@@ -529,7 +528,7 @@
         uids.forEach(function (uid)
         {
             let item = game.getItemByUid(uid);
-            console.log(item);
+
             // If uid is for a valid item, set the order for the item
             if (item)
             {
@@ -621,19 +620,19 @@
     characters: {
         "system": {
             "name": "System Control",
-            "image": "system.png"
+            "image": "system1.jpg"
         },
         "op": {
             "name": "Operator",
-            "image": "girl1.png"
+            "image": "girl1.jpg"
         },
         "pilot": {
             "name": "Pilot",
-            "image": "girl2.png"
+            "image": "girl2.jpg"
         },
         "driver": {
             "name": "Driver",
-            "image": "man1.png"
+            "image": "man1.jpg"
         }
     },
 
@@ -851,7 +850,51 @@
         let item = game.getItemByUid(uid);
 
         return !item || item.lifeCode === "dead";
-    }
+    },
+
+    handleKeyboardInput: function (ev)
+    {
+        // Chatting only allowed in multiplayer when game is running
+        if (game.type === "multiplayer" && game.running)
+        {
+
+            let chatMessage = document.getElementById("chatmessage");
+            // Invisible elements have a null offsetParent
+            let chatInputVisible = chatMessage.offsetParent !== null;
+
+            if (ev.key === "Enter")
+            {
+                if (chatInputVisible)
+                {
+                    // Send any text in the message input
+                    let message = chatMessage.value.trim();
+
+                    if (message)
+                    {
+                        multiplayer.sendChatMessage(message);
+                    }
+
+                    // Clear the input and hide it
+                    chatMessage.value = "";
+                    chatMessage.style.display = "none";
+                } else
+                {
+                    // Show the input and set focus on it
+                    chatMessage.style.display = "inline";
+                    chatMessage.focus();
+                }
+            } else if (ev.key === "Escape")
+            {
+                if (chatInputVisible)
+                {
+                    // Clear the input and hide it
+                    chatMessage.value = "";
+                    chatMessage.style.display = "none";
+                }
+            }
+        }
+    },
+
 
 };
 
@@ -869,3 +912,5 @@ window.addEventListener("resize", function ()
 {
     game.resize();
 });
+
+window.addEventListener("keydown", game.handleKeyboardInput);

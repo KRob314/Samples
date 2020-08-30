@@ -45,7 +45,7 @@
             pixelOffsetY: 10,
             radius: 11,
             speed: 20,
-            sight: 4,
+            sight: 6,
             cost: 500,
             canConstruct: true,
             hitPoints: 50,

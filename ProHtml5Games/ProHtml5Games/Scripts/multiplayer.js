@@ -22,6 +22,12 @@
         this.websocket.addEventListener("error", multiplayer.handleWebSocketConnectionError);
     },
 
+    // Display an error message and end game in case of a connection error
+    handleWebSocketConnectionError: function ()
+    {
+        multiplayer.endGame("Error connecting to multiplayer server.");
+    },
+
     // Display multiplayer lobby screen after connection is opened
     handleWebSocketOpen: function ()
     {
@@ -53,6 +59,22 @@
                 multiplayer.play();
                 break;
 
+            case "latency-ping":
+                multiplayer.sendWebSocketMessage({ type: "latency-pong" });
+                break;
+
+            case "game-tick":
+                multiplayer.lastReceivedTick = messageObject.tick;
+                multiplayer.commands[messageObject.tick] = messageObject.commands;
+                break;
+
+            case "end-game":
+                multiplayer.endGame(messageObject.message);
+                break;
+
+            case "chat":
+                game.showMessage(messageObject.from, messageObject.message);
+                break;
         }
     },
 
@@ -180,6 +202,9 @@
         multiplayer.websocket.removeEventListener("open", multiplayer.handleWebSocketOpen);
         multiplayer.websocket.removeEventListener("message", multiplayer.handleWebSocketMessage);
 
+        multiplayer.websocket.removeEventListener("close", multiplayer.handleWebSocketConnectionError);
+        multiplayer.websocket.removeEventListener("error", multiplayer.handleWebSocketConnectionError);
+
         multiplayer.websocket.close();
 
         // Enable room list and join button
@@ -255,12 +280,66 @@
         // Run the animation loop once
         game.animationLoop();
 
+        // Instead of animationLoop, use tickLoop, which will coordinate with the server to call animationLoop
+        multiplayer.animationInterval = setInterval(multiplayer.tickLoop, game.animationTimeout);
+
         game.start();
     },
 
-
     sendCommand: function (uids, details)
     {
-        game.processCommand(uids, details);
+        multiplayer.sentCommandForTick = true;
+        multiplayer.sendWebSocketMessage({ type: "command", uids: uids, details: details, currentTick: multiplayer.currentTick });
     },
+
+    tickLoop: function ()
+    {
+        // If the commands for that tick have been received
+        // execute the commands and move on to the next tick
+        // otherwise wait for server to catch up
+        if (multiplayer.currentTick <= multiplayer.lastReceivedTick)
+        {
+            var commands = multiplayer.commands[multiplayer.currentTick];
+
+            if (commands)
+            {
+                for (var i = 0; i < commands.length; i++)
+                {
+                    game.processCommand(commands[i].uids, commands[i].details);
+                }
+            }
+
+            game.animationLoop();
+
+            // In case no command was sent for this current tick, send an empty command to the server
+            // So that the server knows that everything is working smoothly
+            if (!multiplayer.sentCommandForTick)
+            {
+                multiplayer.sendCommand();
+            }
+
+            // Move on to the next tick
+            multiplayer.currentTick++;
+            multiplayer.sentCommandForTick = false;
+        }
+    },
+
+    loseGame: function ()
+    {
+        multiplayer.sendWebSocketMessage({ type: "lose-game" });
+    },
+
+    endGame: function (message)
+    {
+        game.running = false;
+        clearInterval(multiplayer.animationInterval);
+
+        // Show reason for game ending, and on OK, exit multiplayer screen
+        game.showMessageBox(message, multiplayer.closeAndExit);
+    },
+
+    sendChatMessage: function (message)
+    {
+        multiplayer.sendWebSocketMessage({ type: "chat", message: message });
+    }
 };

@@ -13,9 +13,15 @@ var maps = {
 /* The actual levels played in the game */
 var levels = {
     "singleplayer": [
+
+      
+
+
         {
             "name": "Rescue",
-            "briefing": "In the months since the great war, mankind has fallen into chaos. Billions are dead with cities in ruins.\nSmall groups of survivors band together to try and survive as best as they can.\nWe are trying to reach out to all the survivors in this sector before we join back with the main colony.",
+            "briefing": "In the months since the great war, mankind has fallen into chaos. Billions are dead with cities in ruins.\n \
+            Small groups of survivors band together to try and survive as best as they can.\n \
+            We are trying to reach out to all the survivors in this sector before we join back with the main colony.",
 
             /* Map Details */
             "mapName": "plains",
@@ -37,6 +43,7 @@ var levels = {
 
                 /* Our hero tank */
                 { "type": "vehicles", "name": "heavy-tank", "uid": -1, "x": 57, "y": 12, "direction": 4, "team": "blue" },
+                { "type": "vehicles", "name": "scout-tank", "uid": -7, "x": 57, "y": 14, "direction": 4, "team": "blue" },
 
                 /* Two transport vehicles waiting just to be rescued just outside the visible map */
                 { "type": "vehicles", "name": "transport", "uid": -3, "selectable": false, "x": -3, "y": 2, "direction": 2, "team": "blue" },
@@ -45,6 +52,7 @@ var levels = {
                 /* Two damaged enemy scout-tanks patroling the area*/
                 { "type": "vehicles", "name": "scout-tank", "uid": -2, "x": 40, "y": 20, "direction": 4, "team": "green", "life": 20, "orders": { "type": "patrol", "from": { "x": 34, "y": 20 }, "to": { "x": 42, "y": 25 } } },
                 { "type": "vehicles", "name": "scout-tank", "uid": -5, "x": 14, "y": 0, "direction": 4, "team": "green", "life": 20, "orders": { "type": "patrol", "from": { "x": 14, "y": 0 }, "to": { "x": 14, "y": 14 } } },
+                { "type": "vehicles", "name": "scout-tank", "uid": -6, "x": 50, "y": 20, "direction": 2, "team": "green", "life": 20, "orders": { "type": "patrol", "from": { "x": 57, "y": 20 }, "to": { "x": 57, "y": 25 } } },
 
             ],
 
@@ -151,7 +159,7 @@ var levels = {
 
         {
             "name": "Assault",
-            "briefing": "Thanks to the supplies from the convoy, we now have the base up and running.\n The rebels nearby are proving to be a problem. We need to take them out. \n First set up the base defences. Then find and destroy all rebels in the area.\n The colony will be sending us reinforcements to help us out.",
+            "briefing": "Thanks to the supplies from the convoy, we now have the base up and running.\n The rebels nearby are proving to be a problem. We need to take them out. \n First set up the base defenses. Then find and destroy all rebels in the area.\n The colony will be sending us reinforcements to help us out.",
 
             /* Map Details */
             "mapName": "plains",
@@ -594,7 +602,295 @@ var levels = {
                     }
                 },
             ],
-        }
+        },
+
+        {
+            "name": "Under Siege",
+            "briefing": "some story line.",
+
+            /* Map Details */
+            "mapName": "plains",
+            "startX": 0,
+            "startY": 20,
+
+            /* Entities to be loaded */
+            "requirements": {
+                "buildings": ["base", "ground-turret", "starport", "harvester"],
+                "vehicles": ["transport", "scout-tank", "heavy-tank", "harvester"],
+                "aircraft": ["chopper", "wraith"],
+                "terrain": ["oilfield"]
+            },
+
+            /* Economy Related*/
+            "cash": {
+                "blue": 500,
+                "green": 0
+            },
+
+            /* Entities to be added */
+            "items": [
+                /* The Rebel Base, which is now in our hands */
+                { "type": "buildings", "name": "base", "uid": -11, "x": 5, "y": 36, "team": "blue" },
+                { "type": "buildings", "name": "starport", "uid": -12, "x": 1, "y": 28, "team": "blue" },
+                { "type": "buildings", "name": "starport", "uid": -13, "x": 4, "y": 32, "team": "blue" },
+                { "type": "buildings", "name": "harvester", "x": 1, "y": 37, "team": "blue", "action": "deploy" },
+                { "type": "buildings", "name": "ground-turret", "x": 7, "y": 28, "team": "blue" },
+                { "type": "buildings", "name": "ground-turret", "x": 8, "y": 32, "team": "blue" },
+                { "type": "buildings", "name": "ground-turret", "x": 11, "y": 37, "team": "blue" },
+                { "type": "buildings", "name": "ground-turret", "x": 14, "y": 28, "team": "blue" },
+
+                { "type": "terrain", "name": "oilfield", "x": 8, "y": 38, "action": "hint" },
+                { "type": "terrain", "name": "oilfield", "x": 12, "y": 38, "action": "hint" },
+                { "type": "terrain", "name": "oilfield", "x": 15, "y": 38, "action": "hint" },
+                { "type": "terrain", "name": "oilfield", "x": 18, "y": 38, "action": "hint" },
+
+                /* The transports that need to be protected*/
+                { "type": "vehicles", "name": "transport", "uid": -1, "x": 2, "y": 33, "team": "blue", "direction": 2, "selectable": false },
+                { "type": "vehicles", "name": "transport", "uid": -2, "x": 1, "y": 34, "team": "blue", "direction": 2, "selectable": false },
+                { "type": "vehicles", "name": "transport", "uid": -3, "x": 2, "y": 35, "team": "blue", "direction": 2, "selectable": false },
+                { "type": "vehicles", "name": "transport", "uid": -4, "x": 1, "y": 36, "team": "blue", "direction": 2, "selectable": false },
+                { "type": "vehicles", "name": "harvester", "x": 14, "y": 35, "team": "blue", "direction": 2 },
+                { "type": "vehicles", "name": "harvester", "x": 16, "y": 35, "team": "blue", "direction": 2 },
+                { "type": "vehicles", "name": "harvester", "x": 18, "y": 35, "team": "blue", "direction": 2 },
+                { "type": "vehicles", "name": "harvester", "x": 20, "y": 35, "team": "blue", "direction": 1 },
+
+                /* The chopper pilot from the last mission */
+                {
+                    "type": "aircraft",
+                    "name": "chopper",
+                    "x": 15, "y": 40,
+                    "team": "blue",
+                    "selectable": false,
+                    "uid": -5,
+                    "orders": { "type": "patrol", "from": { "x": 15, "y": 40 }, "to": { "x": 0, "y": 25 } }
+                },
+
+                /* The first wave of attacks*/
+                { "type": "vehicles", "name": "scout-tank", "x": 15, "y": 16, "direction": 4, "team": "green", "orders": { "type": "hunt" } },
+                { "type": "vehicles", "name": "scout-tank", "x": 17, "y": 16, "direction": 4, "team": "green", "orders": { "type": "hunt" } },
+
+                /* Secret Rebel bases*/
+                { "type": "buildings", "name": "starport", "uid": -23, "x": 35, "y": 37, "team": "green" },
+                { "type": "buildings", "name": "starport", "uid": -24, "x": 33, "y": 37, "team": "green" },
+                { "type": "buildings", "name": "harvester", "x": 28, "y": 39, "team": "green", "action": "deploy" },
+                { "type": "buildings", "name": "harvester", "x": 30, "y": 39, "team": "green", "action": "deploy" },
+
+                { "type": "buildings", "name": "starport", "uid": -21, "x": 3, "y": 0, "team": "green" },
+                { "type": "buildings", "name": "starport", "uid": -22, "x": 6, "y": 0, "team": "green" },
+                { "type": "buildings", "name": "harvester", "x": 0, "y": 2, "team": "green", "action": "deploy" },
+                { "type": "buildings", "name": "harvester", "x": 0, "y": 4, "team": "green", "action": "deploy" },
+
+            ],
+
+            /* Conditional and Timed Trigger Events */
+            "triggers": [
+                {
+                    // Check if any of the transports is dead
+                    "condition": function ()
+                    {
+                        return game.isItemDead(-1) || game.isItemDead(-2) || game.isItemDead(-3) || game.isItemDead(-4);
+                    },
+                    // End the level as failure
+                    "action": function ()
+                    {
+                        singleplayer.endLevel(false);
+                    }
+                },
+                {
+                    "type": "timed", "time": 5000,
+                    // Display warning message about attacks
+                    "action": function ()
+                    {
+                        game.showMessage("op", "Commander!! The rebels have started attacking. We need to defend the base and protect the transports at all costs.");
+                    }
+                },
+                {
+                    "type": "timed", "time": 20000,
+                    // Add a new transport to the top right of the map
+                    "action": function ()
+                    {
+                        game.add({ "type": "vehicles", "name": "transport", "x": 57, "y": 3, "team": "blue", "direction": 4, "selectable": false, "uid": -6 });
+                        game.showMessage("driver", "Commander!! The colony has sent some extra supplies. We are coming in from the North East sector through rebel territory. We could use a little protection.");
+                    }
+                },
+                {
+                    "type": "timed", "time": 24000,
+                    // Make the pilot guard the new transport
+                    "action": function ()
+                    {
+                        game.sendCommand([-5], { "type": "guard", "toUid": -6 });
+                        game.showMessage("pilot", "Hang tight. I'm on my way.");
+                    }
+                },
+
+                {
+                    "type": "timed", "time": 28000,
+                    // Add some villains to make it interesting
+                    "action": function ()
+                    {
+                        game.add({ "type": "vehicles", "name": "scout-tank", "x": 57, "y": 28, "team": "green", "orders": { "type": "hunt" } });
+                        game.add({ "type": "aircraft", "name": "wraith", "x": 55, "y": 33, "team": "green", "orders": { "type": "sentry" } });
+                        game.add({ "type": "aircraft", "name": "wraith", "x": 53, "y": 33, "team": "green", "orders": { "type": "sentry" } });
+                        game.add({ "type": "vehicles", "name": "scout-tank", "x": 35, "y": 25, "life": 20, "direction": 4, "team": "green", "orders": { "type": "patrol", "from": { "x": 35, "y": 25 }, "to": { "x": 35, "y": 30 } } });
+                    }
+                },
+                {
+                    "type": "timed", "time": 48000,
+                    // Start moving the transport towards the base
+                    "action": function ()
+                    {
+                        game.showMessage("driver", "Thanks! Appreciate the backup. All right. Off we go.");
+                        game.sendCommand([-6], { "type": "move", "to": { "x": 0, "y": 32 } });
+                    }
+                },
+                {
+                    "type": "conditional",
+                    // Check if pilot has been hurt
+                    "condition": function ()
+                    {
+                        let pilot = game.getItemByUid(-5);
+
+                        return pilot.life < pilot.hitPoints;
+                    },
+                    // Have pilot ask for help
+                    "action": function ()
+                    {
+                        game.showMessage("pilot", "We are under attack! Need assistance. This doesn't look good.");
+                    }
+                },
+                {
+                    "type": "conditional",
+                    // Check if new transport has reached base with supplies
+                    "condition": function ()
+                    {
+                        let driver = game.getItemByUid(-6);
+
+                        return driver && driver.x < 2 && driver.y > 30;
+                    },
+                    // Give player extra cash "supplies"
+                    "action": function ()
+                    {
+                        game.showMessage("driver", "The rebels came out of nowhere. There was nothing we could do. She saved our lives. Hope these supplies were worth it.");
+                        game.cash["blue"] += 1200;
+                    }
+                },
+                {
+                    "type": "timed", "time": 150000, "repeat": true,
+                    // Send in waves of enemies every 150 seconds
+                    "action": function ()
+                    {
+                        // Count aircraft and tanks already available to bad guys
+                        let wraithCount = 0;
+                        let chopperCount = 0;
+                        let scoutTankCount = 0;
+                        let heavyTankCount = 0;
+
+                        game.items.forEach(function (item)
+                        {
+                            if (item.team === "green")
+                            {
+                                switch (item.name)
+                                {
+                                    case "chopper":
+                                        chopperCount++;
+                                        break;
+                                    case "wraith":
+                                        wraithCount++;
+                                        break;
+                                    case "scout-tank":
+                                        scoutTankCount++;
+                                        break;
+                                    case "heavy-tank":
+                                        heavyTankCount++;
+                                        break;
+                                }
+                            }
+                        }, this);
+
+                        // Make sure enemy has atleast two wraiths and two heavy tanks, and use the remaining starports to build choppers and scouts
+                        if (wraithCount === 0)
+                        {
+                            // No wraiths alive. Ask both starports to make wraiths
+                            game.sendCommand([-23, -24], { type: "construct-unit", details: { type: "aircraft", name: "wraith", "orders": { "type": "hunt" } } });
+                        } else if (wraithCount === 1)
+                        {
+                            // One wraith alive. Ask starports to make one wraith and one chopper
+                            game.sendCommand([-23], { type: "construct-unit", details: { type: "aircraft", name: "wraith", "orders": { "type": "hunt" } } });
+                            game.sendCommand([-24], { type: "construct-unit", details: { type: "aircraft", name: "chopper", "orders": { "type": "hunt" } } });
+                        } else
+                        {
+                            // Two wraiths alive. Ask both starports to make choppers
+                            game.sendCommand([-23, -24], { type: "construct-unit", details: { type: "aircraft", name: "chopper", "orders": { "type": "hunt" } } });
+                        }
+
+                        if (heavyTankCount === 0)
+                        {
+                            // No heavy-tanks alive. Ask both starports to make heavy-tanks
+                            game.sendCommand([-21, -22], { type: "construct-unit", details: { type: "vehicles", name: "heavy-tank", "orders": { "type": "hunt" } } });
+                        } else if (heavyTankCount === 1)
+                        {
+                            // One heavy-tank alive. Ask starports to make one heavy-tank and one scout-tank
+                            game.sendCommand([-21], { type: "construct-unit", details: { type: "vehicles", name: "heavy-tank", "orders": { "type": "hunt" } } });
+                            game.sendCommand([-22], { type: "construct-unit", details: { type: "vehicles", name: "scout-tank", "orders": { "type": "hunt" } } });
+                        } else
+                        {
+                            // Two heavy-tanks alive. Ask both starports to make scout-tanks
+                            game.sendCommand([-21, -22], { type: "construct-unit", details: { type: "vehicles", name: "scout-tank", "orders": { "type": "hunt" } } });
+                        }
+                        // Ask any enemy units on the field to attack
+                        let uids = [];
+
+                        game.items.forEach(function (item)
+                        {
+                            if (item.team === "green" && item.canAttack)
+                            {
+                                uids.push(item.uid);
+                            }
+                        }, this);
+
+                        game.sendCommand(uids, { "type": "hunt" });
+                    }
+                },
+                {
+                    "type": "timed", "time": 480000,
+                    // After 8 minutes, start preparing for the end
+                    "action": function ()
+                    {
+                        game.showMessage("op", "Commander!! The colony air fleet is just a few minutes away.");
+                    }
+                },
+                {
+                    "type": "timed", "time": 600000,
+                    //After 10 minutes send in reinforcements
+                    "action": function ()
+                    {
+                        game.showMessage("op", "Commander!! The colony air fleet is approaching");
+                        game.add({ "type": "aircraft", "name": "wraith", "x": -1, "y": 28, "team": "blue", "orders": { "type": "hunt" } });
+                        game.add({ "type": "aircraft", "name": "chopper", "x": -1, "y": 29, "team": "blue", "orders": { "type": "hunt" } });
+                        game.add({ "type": "aircraft", "name": "wraith", "x": -1, "y": 30, "team": "blue", "orders": { "type": "hunt" } });
+                        game.add({ "type": "aircraft", "name": "chopper", "x": -1, "y": 31, "team": "blue", "orders": { "type": "hunt" } });
+                        game.add({ "type": "aircraft", "name": "wraith", "x": -1, "y": 32, "team": "blue", "orders": { "type": "hunt" } });
+                        game.add({ "type": "aircraft", "name": "chopper", "x": -1, "y": 33, "team": "blue", "orders": { "type": "hunt" } });
+                        game.add({ "type": "aircraft", "name": "wraith", "x": -1, "y": 34, "team": "blue", "orders": { "type": "hunt" } });
+                        game.add({ "type": "aircraft", "name": "chopper", "x": -1, "y": 35, "team": "blue", "orders": { "type": "hunt" } });
+                        game.add({ "type": "aircraft", "name": "wraith", "x": -1, "y": 36, "team": "blue", "orders": { "type": "hunt" } });
+                        game.add({ "type": "aircraft", "name": "chopper", "x": -1, "y": 37, "team": "blue", "orders": { "type": "hunt" } });
+                        game.add({ "type": "aircraft", "name": "wraith", "x": -1, "y": 38, "team": "blue", "orders": { "type": "hunt" } });
+                        game.add({ "type": "aircraft", "name": "chopper", "x": -1, "y": 39, "team": "blue", "orders": { "type": "hunt" } });
+                    }
+                },
+                {
+                    "type": "timed", "time": 660000,
+                    // And a minute after the reinforcements arrive, end the level
+                    "action": function ()
+                    {
+                        singleplayer.endLevel(true);
+                    }
+                },
+            ],
+        },
+
+   
     ],
 
     "multiplayer": [

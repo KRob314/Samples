@@ -62,6 +62,9 @@ wsServer.on("request", function (request)
     // Send a fresh game room status list the first time player connects
     sendRoomList(connection);
 
+    // Measure latency for player
+    measureLatencyStart(player);
+
     // Handle receiving of messages
     connection.on("message", function (message)
     {
@@ -99,6 +102,45 @@ wsServer.on("request", function (request)
                     }
 
                     break;
+
+                case "latency-pong":
+                    measureLatencyEnd(player);
+
+                    // Measure latency at least thrice
+                    if (player.latencyTrips.length < 3)
+                    {
+                        measureLatencyStart(player);
+                    }
+                    break;
+
+                case "command":
+                    if (player.room && player.room.status === "running")
+                    {
+                        if (clientMessage.uids)
+                        {
+                            player.room.commands.push({ uids: clientMessage.uids, details: clientMessage.details });
+                        }
+
+                        player.room.lastTickConfirmed[player.color] = clientMessage.currentTick + player.tickLag;
+                    }
+                    break;
+
+                case "lose-game":
+                    if (player.room && player.room.status === "running")
+                    {
+                        endGame(player.room, "The " + player.color + " team has been defeated.");
+                    }
+                    break;
+
+                case "chat":
+                    if (player.room && player.room.status === "running")
+                    {
+                        // Sanitize the message to remove any HTML tags
+                        var cleanedMessage = clientMessage.message.replace(/[<>]/g, "");
+
+                        sendRoomWebSocketMessage(player.room, { type: "chat", from: player.color, message: cleanedMessage });
+                    }
+                    break;
             }
         }
     });
@@ -114,6 +156,27 @@ wsServer.on("request", function (request)
         if (index > -1)
         {
             players.splice(index, 1);
+        }
+
+        var room = player.room;
+
+        if (room)
+        {
+            var status = room.status;
+
+            // If the player was in a room, remove him from the room
+            leaveRoom(player, room.roomId);
+
+            // If the game had started or was already running, end the game and notify other player
+            if (status === "running" || status === "starting")
+            {
+                var message = "The " + player.color + " player has been disconnected.";
+
+                endGame(room, message);
+            }
+
+            // Notify everyone about the changes
+            sendRoomListToEveryone();
         }
 
     });
@@ -259,6 +322,36 @@ function startGame(room)
     // Notify players to start the game
     sendRoomWebSocketMessage(room, { type: "play-game" });
 
+    room.commands = [];
+    room.lastTickConfirmed = { "blue": 0, "green": 0 };
+    room.currentTick = 0;
+
+    // Calculate tick lag for room as the max of both player's tick lags
+    var roomTickLag = Math.max(room.players[0].tickLag, room.players[1].tickLag);
+
+    room.interval = setInterval(function ()
+    {
+        // Confirm that both players have send in commands for up to present tick
+        if (room.lastTickConfirmed["blue"] >= room.currentTick && room.lastTickConfirmed["green"] >= room.currentTick)
+        {
+            // Commands should be executed after the tick lag
+            sendRoomWebSocketMessage(room, { type: "game-tick", tick: room.currentTick + roomTickLag, commands: room.commands });
+            room.currentTick++;
+            room.commands = [];
+        } else
+        {
+            // One of the players is causing the game to lag. Handle appropriately
+            if (room.lastTickConfirmed["blue"] < room.currentTick)
+            {
+                console.log("Room", room.roomId, "Blue is lagging on Tick:", room.currentTick, "by", room.currentTick - room.lastTickConfirmed["blue"]);
+            }
+
+            if (room.lastTickConfirmed["green"] < room.currentTick)
+            {
+                console.log("Room", room.roomId, "Green is lagging on Tick:", room.currentTick, "by", room.currentTick - room.lastTickConfirmed["green"]);
+            }
+        }
+    }, gameTimeout);
 }
 
 function sendRoomWebSocketMessage(room, messageObject)
@@ -269,4 +362,63 @@ function sendRoomWebSocketMessage(room, messageObject)
     {
         player.connection.send(messageString);
     });
+}
+
+function measureLatencyStart(player)
+{
+    var measurement = { start: Date.now() };
+
+    player.latencyTrips.push(measurement);
+
+    var clientMessage = { type: "latency-ping" };
+
+    player.connection.send(JSON.stringify(clientMessage));
+}
+
+// The game clock will run at 1 tick every 100 milliseconds
+var gameTimeout = 100;
+
+function measureLatencyEnd(player)
+{
+    // Complete the calculations for the current measuremement
+    var currentMeasurement = player.latencyTrips[player.latencyTrips.length - 1];
+
+    currentMeasurement.end = Date.now();
+    currentMeasurement.roundTrip = currentMeasurement.end - currentMeasurement.start;
+
+    // Calculate the average round trip for all the trips so far
+    var totalTime = 0;
+
+    player.latencyTrips.forEach(function (measurement)
+    {
+        totalTime += measurement.roundTrip;
+    });
+
+    player.averageRoundTrip = totalTime / player.latencyTrips.length;
+
+    // By default game commands are run one tick after they are received by the server
+    player.tickLag = 1;
+
+    // If averageRoundTrip is greater than gameTimeout, increase tickLag to adjust for latency
+    player.tickLag += Math.round(player.averageRoundTrip / gameTimeout);
+
+    console.log("Measuring Latency for player. Attempt", player.latencyTrips.length, "- Average Round Trip:", player.averageRoundTrip + "ms", "Tick Lag:", player.tickLag);
+}
+
+function endGame(room, message)
+{
+    // Stop the game loop on the server
+    clearInterval(room.interval);
+
+    // Tell both players to end game
+    sendRoomWebSocketMessage(room, { type: "end-game", message: message });
+
+    // Empty the room
+    room.players.forEach(function (player)
+    {
+        leaveRoom(player, room.roomId);
+    });
+    room.status = "empty";
+
+    sendRoomListToEveryone();
 }

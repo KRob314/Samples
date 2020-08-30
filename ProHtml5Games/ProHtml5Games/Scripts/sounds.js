@@ -34,8 +34,8 @@
             // Play audio for sound name based on counter location
             let audioObject = sound.audioObjects[sound.counter];
 
-            audioObject.volume = 0.05
-            console.log(audioObject.volume);
+            audioObject.volume = 0.03
+            //console.log(audioObject.volume);
 
             audioObject.play();
             // Move to the next audio next time

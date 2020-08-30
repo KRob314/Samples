@@ -55,10 +55,9 @@
                 <div id="callerpicture"></div>
                 <div id="cash"></div>
                 <div id="sidebarbuttons">
-                    <input type="button" id="starport" title="Starport">
+                    <input type="button" id="starport" title="Starport" onclick="singleplayer.showItemDescription(1)">
                     <input type="button" id="ground-turret" title="Turret">
                     <input type="button" id="harvester" title="Harvester">
-                    <!--<input type="button" id="skull" />-->
                     <input type="button" id="scout-tank" title="Scout Tank">
                     <input type="button" id="heavy-tank" title="Heavy Tank">
                     <input type="button" id="chopper" title="Copter">
@@ -66,6 +65,7 @@
                 </div>
                 <canvas id="gamebackgroundcanvas"></canvas>
                 <canvas id="gameforegroundcanvas"></canvas>
+                <input type="text" id="chatmessage">
             </div>
 
             <div id="messageboxscreen" class="gamelayer">

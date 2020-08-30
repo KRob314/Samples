@@ -23,6 +23,8 @@
                 buttonTitle = button.id + ' ' + buildings.list[button.id].cost;
             }
 
+            buttonTitle += singleplayer.showItemDescription(button.id);
+
             button.setAttribute('title', buttonTitle);
             //button.setAttribute('title', sidebar.constructables[button.id].cost);
 
