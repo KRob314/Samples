@@ -5,7 +5,10 @@ using SpyStore.Dal.Repos.Base;
 using SpyStore.Dal.Repos.Interfaces;
 using SpyStore.Models.Entities;
 using SpyStore.Models.ViewModels;
+using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace SpyStore.Dal.Repos
@@ -75,7 +78,7 @@ namespace SpyStore.Dal.Repos
             return Update(entity, product, persist);
         }
 
-        public int Update( ShoppingCartRecord entity, Product product, bool persist = true)
+        public int Update(ShoppingCartRecord entity, Product product, bool persist = true)
         {
             if (entity.Quantity <= 0)
             {
@@ -84,7 +87,7 @@ namespace SpyStore.Dal.Repos
 
             if (entity.Quantity > product.UnitsInStock)
             {
-                throw new SpyStoreInvalidQuantityException( "Can't add more product than available in stock");
+                throw new SpyStoreInvalidQuantityException("Can't add more product than available in stock");
             }
             var dbRecord = Find(entity.Id);
             if (entity.TimeStamp != null &&
@@ -107,5 +110,71 @@ namespace SpyStore.Dal.Repos
             return persist ? SaveChanges() : counter;
 
         }
+
+        public override int Add(ShoppingCartRecord entity, bool persist = true)
+        {
+            var product = _productRepo.FindAsNoTracking(entity.ProductId);
+            if (product == null)
+            {
+                throw new SpyStoreInvalidProductException(
+                "Unable to locate the product");
+            }
+            return Add(entity, product, persist);
+        }
+        public int Add(
+         ShoppingCartRecord entity, Product product, bool persist = true)
+        {
+            var item = GetBy(entity.ProductId);
+            if (item == null)
+            {
+                if (entity.Quantity > product.UnitsInStock)
+                {
+                    throw new SpyStoreInvalidQuantityException(
+                    "Can't add more product than available in stock");
+                }
+                entity.LineItemTotal = entity.Quantity * product.CurrentPrice;
+                return base.Add(entity, persist);
+            }
+            item.Quantity += entity.Quantity;
+            return item.Quantity <= 0
+            ? Delete(item, persist)
+            : Update(item, product, persist);
+        }
+
+        public override int AddRange(IEnumerable<ShoppingCartRecord> entities, bool persist = true)
+
+        {
+            int counter = 0;
+            foreach (var item in entities)
+            {
+                var product = _productRepo.FindAsNoTracking(item.ProductId);
+                counter += Add(item, product, false);
+            }
+            return persist ? SaveChanges() : counter;
+        }
+
+
+        public int Purchase(int customerId)
+        {
+            var customerIdParam = new SqlParameter("@customerId", SqlDbType.Int)
+            {
+                Direction = ParameterDirection.Input,
+                Value = customerId
+            };
+            var orderIdParam = new SqlParameter("@orderId", SqlDbType.Int)
+            {
+                Direction = ParameterDirection.Output
+            };
+            try
+            {
+                Context.Database.ExecuteSqlCommand("EXEC [Store].[PurchaseItemsInCart] @customerId, @orderid out", customerIdParam, orderIdParam);
+            }
+            catch (Exception ex)
+            {
+                return -1;
+            }
+            return (int)orderIdParam.Value;
+        }
     }
+
 }
