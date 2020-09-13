@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  spystore.service:
+    image: ${DOCKER_REGISTRY-}spystoreservice
+    build:
+      context: .
+      dockerfile: SpyStore.Service/Dockerfile
