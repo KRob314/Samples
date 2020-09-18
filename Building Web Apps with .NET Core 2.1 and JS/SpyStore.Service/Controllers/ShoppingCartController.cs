@@ -33,7 +33,7 @@ namespace SpyStore.Service.Controllers
             }
             int orderId;
             orderId = _repo.Purchase(customerId);
-            //Location: http://localhost:8477/api/OrderDetails/1
+            //Location: http://localhost:7940/api/OrderDetails/1
             return CreatedAtRoute("GetOrderDetails",
             routeValues: new { orderId = orderId }, null);
         }

@@ -79,11 +79,9 @@ namespace SpyStore.Mvc.Support
 
         public async Task<IList<ProductViewModel>> GetFeaturedProductsAsync()
         {
-            var response = await _client
-            .GetAsync($"{_settings.ProductBaseUri}/featured");
+            var response = await _client.GetAsync($"{_settings.ProductBaseUri}/featured");
             response.EnsureSuccessStatusCode();
-            var result = await response.Content
-            .ReadAsAsync<IList<ProductViewModel>>();
+            var result = await response.Content.ReadAsAsync<IList<ProductViewModel>>();
             return result;
         }
 

@@ -44,7 +44,7 @@ namespace SpyStore.Service.Controllers
             record.CustomerId = customerId;
             _repo.Context.CustomerId = customerId;
             _repo.Add(record);
-            //Location: http://localhost:8477/api/ShoppingCartRecord/1 (201)
+            //Location: http://localhost:7940/api/ShoppingCartRecord/1 (201)
             CreatedAtRouteResult createdAtRouteResult =
             CreatedAtRoute("GetShoppingCart",
             new { controller = "ShoppingCart", customerId = customerId },
@@ -62,7 +62,7 @@ namespace SpyStore.Service.Controllers
             item.DateCreated = DateTime.Now;
             _repo.Context.CustomerId = item.CustomerId;
             _repo.Update(item);
-            //Location: http://localhost:8477/api/ShoppingCart/0 (201)
+            //Location: http://localhost:7940/api/ShoppingCart/0 (201)
             return CreatedAtRoute("GetShoppingCartRecord", new { controller = "ShoppingCartRecord", recordId = item.Id }, null);
         }
 
