@@ -1,0 +1,19 @@
+﻿@page "/"
+
+<Alert Show="showAlert" OnOk="@OkClickHandler">
+    <h1>Alert</h1>
+    <p>Today is @DateTime.Now.DayOfWeek.</p>
+</Alert>
+
+<button @onclick="@(() => showAlert = true)">Show Alert</button>
+
+
+@code
+{
+    public bool showAlert = false;
+
+    private void OkClickHandler()
+    {
+        showAlert = false;
+    }
+}
