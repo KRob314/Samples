@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LocalStorage", "LocalStorage\LocalStorage.csproj", "{51FB3729-AE6B-46DC-B314-AE3470C829E1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{51FB3729-AE6B-46DC-B314-AE3470C829E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51FB3729-AE6B-46DC-B314-AE3470C829E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51FB3729-AE6B-46DC-B314-AE3470C829E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51FB3729-AE6B-46DC-B314-AE3470C829E1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {33D2E7F6-C4D2-4B3F-B443-C44D356DA2F8}
+	EndGlobalSection
+EndGlobal

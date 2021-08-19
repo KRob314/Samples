@@ -1,11 +1,14 @@
 ﻿@page "/"
+@using MyComponents; 
 
-<Dialog Show="showDialog" OnCancel="DialogCancelHandler" OnOk="DialogOkHandler">
+<Component1/>
+
+<BweDialog Show="showDialog" OnCancel="DialogCancelHandler" OnOk="DialogOkHandler">
     <Title>Quick List [@(Items.Count +1)]</Title>
     <Body>
         Enter New Item: <input @bind="NewItem" />
     </Body>
-</Dialog>
+</BweDialog>
 
 <ol>
     @foreach(var item in Items )
