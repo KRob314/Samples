@@ -1,0 +1,101 @@
+﻿@page "/"
+@using WeatherForecast.Models;
+@using System.Text;
+@using WeatherForecast.Services;
+@inject HttpClient Http;
+@inject IJSRuntime js;
+
+
+@if (forecast == null)
+{
+    <p><em>@message</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-3">
+         <input type="text" @bind-value="@zipCode" class="form-control" placeholder="Zip"/>
+        </div>
+        <div class="col-md-3">
+            <input type="button" class="btn btn-primary" value="Get Forecast" @onclick="GetForecast" />
+        </div>
+    </div>
+    <div class="card-group" style="margin-top:20px;">
+        @foreach (var item in forecast.Daily.Take(5))
+        {
+            <DailyForecast Seconds="@item.Dt" LowTemp="@item.Temp.Min" HighTemp="@item.Temp.Max" Description="@item.Weather[0].Description" Icon="@item.Weather[0].Icon" />
+        }
+    </div>
+}
+
+@code
+{
+    private LocalStorageService localStorage;
+    private OpenWeather forecast;
+    private Position pos;
+    string message = "Loading...";
+    string zipCode = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        localStorage = new LocalStorageService(js);
+
+        try
+        {
+            await GetPosition();
+            await GetForecast();
+        }
+        catch (Exception)
+        {
+            message = "Error encountered";
+        }
+    }
+
+    private async Task GetPosition()
+    {
+        pos = await js.InvokeAsync<Position>("bweInterop.getPosition");
+    }
+
+    private async Task GetForecast()
+    {
+        string APIKey = await js.InvokeAsync<string>("bweInterop.getWeatherForecastKey");
+        StringBuilder url = new StringBuilder();
+
+        if (string.IsNullOrWhiteSpace(zipCode) || zipCode.Length != 5)
+        {
+            url.Append("https://api.openweathermap.org");
+            url.Append("/data/2.5/onecall?");
+            url.Append("lat=");
+            url.Append(pos.Latitude);
+            url.Append("&lon=");
+            url.Append(pos.Longitude);
+            url.Append("&exclude=");
+            url.Append("current,minutely,hourly,alerts");
+            url.Append("&units=imperial");
+            url.Append("&appid=");
+            url.Append(APIKey);
+        }
+        else
+        {
+            url.Append("https://api.openweathermap.org/data/2.5/forecast?zip=");
+            url.Append(zipCode);
+            url.Append("&appid=");
+            url.Append(APIKey);
+        }
+
+
+        forecast = await Http.GetFromJsonAsync<OpenWeather>(url.ToString());
+        await SaveToLocalStorageAsync();
+    }
+
+    async Task SaveToLocalStorageAsync()
+    {
+        await localStorage.SetItemAsync<string>("todayLowTemp", forecast.Daily[0].Temp.Min.ToString());
+        await localStorage.SetItemAsync<string>("todayHighTemp", forecast.Daily[0].Temp.Max.ToString());
+    }
+
+    //async Task ReadFromLocalStorageAsync()
+    //{
+    //    forecast = await localStorage.GetItemAsync<string>("localStorageData");
+    //}
+}
