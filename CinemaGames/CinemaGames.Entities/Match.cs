@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,11 +9,8 @@ namespace CinemaGames.Entities
     public class Match : IEntityBase
     {
         public int Id { get; set; }
-        //[ForeignKey("SeasonId")]
-        public int SeasonId { get; set; }
-        //[ForeignKey("GenreId")]
-        public int GenreId { get; set; }
-        //[ForeignKey("StatusId")]
+        public Nullable<int> SeasonId { get; set; }
+        public Nullable<int> GenreId { get; set; }
         public int StatusId { get; set; }
         public string Name { get; set; }
         public System.DateTime StartDate { get; set; }

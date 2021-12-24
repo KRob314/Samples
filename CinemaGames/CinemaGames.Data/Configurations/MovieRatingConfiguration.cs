@@ -17,8 +17,6 @@ namespace CinemaGames.Data.Configurations
             Property(mr => mr.MovieSubmissionId).IsRequired();
             Property(mr => mr.Rating).IsRequired();
             Property(mr => mr.ReasonForVote).HasMaxLength(2000);
-
-            
         }
     }
 }

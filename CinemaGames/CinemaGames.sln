@@ -7,10 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CinemaGames.Entities", "Cin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CinemaGames.Data", "CinemaGames.Data\CinemaGames.Data.csproj", "{C5B4CD9B-014C-4C79-BB5D-AB879999138B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CinemaGames.Services", "CinemaGames.Services\CinemaGames.Services.csproj", "{FD6607CA-115C-40F9-AAFA-D88519982A12}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CinemaGames.Web", "CinemaGames.Web\CinemaGames.Web.csproj", "{3CEBBB54-BE09-445B-ADC4-F45611D07D44}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,14 +21,6 @@ Global
 		{C5B4CD9B-014C-4C79-BB5D-AB879999138B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5B4CD9B-014C-4C79-BB5D-AB879999138B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C5B4CD9B-014C-4C79-BB5D-AB879999138B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FD6607CA-115C-40F9-AAFA-D88519982A12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FD6607CA-115C-40F9-AAFA-D88519982A12}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FD6607CA-115C-40F9-AAFA-D88519982A12}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FD6607CA-115C-40F9-AAFA-D88519982A12}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3CEBBB54-BE09-445B-ADC4-F45611D07D44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3CEBBB54-BE09-445B-ADC4-F45611D07D44}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3CEBBB54-BE09-445B-ADC4-F45611D07D44}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3CEBBB54-BE09-445B-ADC4-F45611D07D44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

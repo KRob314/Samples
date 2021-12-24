@@ -65,20 +65,11 @@
     <Compile Include="Configurations\SeasonConfiguration.cs" />
     <Compile Include="Configurations\UserConfiguration.cs" />
     <Compile Include="Configurations\UserRoleConfiguration.cs" />
-    <Compile Include="Extensions\UserExtensions.cs" />
     <Compile Include="Infrastructure\DbFactory.cs" />
     <Compile Include="Infrastructure\Disposable.cs" />
     <Compile Include="Infrastructure\IDbFactory.cs" />
     <Compile Include="Infrastructure\IUnitOfWork.cs" />
     <Compile Include="Infrastructure\UnitOfWork.cs" />
-    <Compile Include="Migrations\202104202112195_initial_migration.cs" />
-    <Compile Include="Migrations\202104202112195_initial_migration.designer.cs">
-      <DependentUpon>202104202112195_initial_migration.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202104202139247_initial_migration1.cs" />
-    <Compile Include="Migrations\202104202139247_initial_migration1.designer.cs">
-      <DependentUpon>202104202139247_initial_migration1.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\EntityBaseRepository.cs" />
@@ -97,14 +88,6 @@
   <ItemGroup>
     <Content Include="it\MockData.resources.dll" />
     <Content Include="uk\MockData.resources.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\202104202112195_initial_migration.resx">
-      <DependentUpon>202104202112195_initial_migration.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202104202139247_initial_migration1.resx">
-      <DependentUpon>202104202139247_initial_migration1.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
