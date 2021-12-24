@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace CinemaGames.Entities
     public class Player : IEntityBase
     {
         public int Id { get; set; }
-
+        //[ForeignKey("UserId")]
         public string UserId { get; set; }
         [DisplayName("First Name")]
         public string FirstName { get; set; }

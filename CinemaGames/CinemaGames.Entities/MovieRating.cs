@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,9 @@ namespace CinemaGames.Entities
     public class MovieRating : IEntityBase
     {
         public int Id { get; set; }
+        //[ForeignKey("PlayerId")]
         public int PlayerId { get; set; }
+        //[ForeignKey("MovieSubmissionId")]
         public int MovieSubmissionId { get; set; }
         public int Rating { get; set; }
         public System.DateTime RatingDate { get; set; }
