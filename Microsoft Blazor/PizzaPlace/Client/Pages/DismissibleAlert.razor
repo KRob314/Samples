@@ -1,0 +1,41 @@
+﻿@using Microsoft.AspNetCore.Components;
+@using System;
+
+@if (Show)
+{
+    <div class="alert alert-secondary alert-dismissible fade show mt-4"
+         role="alert">
+        @ChildContent
+        <button type="button" class="close" data-dismiss="alert"
+                aria-label="Close" @onclick="Dismiss">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+@code
+{
+    private bool show;
+
+    [Parameter]
+    public bool Show
+    {
+        get => show;
+        set
+        {
+            if(value != show)
+            {
+                show = value;
+                ShowChanged?.InvokeAsync(show);
+            }
+        }
+    }
+
+    [Parameter]
+    public EventCallback<bool>? ShowChanged { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = default!;
+
+    public void Dismiss() => Show = false;
+}
