@@ -1,9 +1,19 @@
 ﻿@page "/"
+@inject IMenuService MenuService
+@inject IOrderService OrderService
 <!-- Menu -->
 
-<PizzaList Title="Our Selection of Pizzas" Items="@State.Menu.Pizzas" ButtonTitle="Order" ButtonClass="btn btn-success pl-4 pr-4" Selected="@AddToBasket"></PizzaList>
+<div class="row">
+    <div class="col-6">
+        <PizzaList Title="Our Selection of Pizzas" Items="@State.Menu.Pizzas" ButtonTitle="Order" ButtonClass="btn btn-success pl-4 pr-4" Selected="@AddToBasket"></PizzaList>
+    </div>
+    <div class="col-6">
+        <ShoppingBasket Orders="@State.Basket.Orders" GetPizzaFromId="@State.Menu.GetPizza" Selected="@RemoveFromBasket"></ShoppingBasket>
+    </div>
+</div>
 
-<ShoppingBasket Orders="@State.Basket.Orders" GetPizzaFromId="@State.Menu.GetPizza" Selected="@RemoveFromBasket"></ShoppingBasket>
+
+
 
 <CustomerEntry Title="Please enter your details below"
                @bind-Customer="@State.Basket.Customer"
@@ -17,20 +27,38 @@
 @code {
     private State State { get; } = new State();
 
+    protected override async Task OnInitializedAsync()
+    {
+        Menu menu = await MenuService.GetMenuAsync();
+
+        foreach(Pizza pizza in menu.Pizzas)
+        {
+            State.Menu.Add(pizza);
+        }
+    }
+
     protected override void OnInitialized()
     {
-        State.Menu.Add(
-        new Pizza(1, "Pepperoni", 8.99M, Spiciness.Spicy));
-        State.Menu.Add(new Pizza(2, "Margarita", 7.99M, Spiciness.None));
-        State.Menu.Add(
-        new Pizza(3, "Diabolo", 9.99M, Spiciness.Hot));
+        //State.Menu.Add(
+        //  new Pizza(1, "Pepperoni", 8.99M, Spiciness.Spicy));
+        //State.Menu.Add(
+        //  new Pizza(2, "Margarita", 7.99M, Spiciness.None));
+        //State.Menu.Add(
+        //  new Pizza(3, "Diabolo", 9.99M, Spiciness.Hot));
     }
-    private void AddToBasket(Pizza pizza) => State.Basket.Add(pizza.Id);
 
-    private void RemoveFromBasket(int pos) => State.Basket.RemoveAt(pos);
-
-    private void PlaceOrder()
+    private async Task PlaceOrder()
     {
-        Console.WriteLine("Placing order");
+        await OrderService.PlaceOrder(State.Basket);
     }
+
+    private string SpicinessImage(Spiciness spiciness)
+      => $"images/{spiciness.ToString().ToLower()}.png";
+
+    private void AddToBasket(Pizza pizza)
+    => State.Basket.Add(pizza.Id);
+
+    private void RemoveFromBasket(int pos)
+    => State.Basket.RemoveAt(pos);
+
 }
