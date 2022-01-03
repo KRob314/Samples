@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
+using PizzaPlace.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+builder.Services.AddDbContext<PizzaPlaceDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("PizzaPlaceDb")));
 
 var app = builder.Build();
 
