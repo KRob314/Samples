@@ -1,37 +1,53 @@
 ﻿@page "/"
 @inject IMenuService MenuService
 @inject IOrderService OrderService
+@inject State State
+@inject NavigationManager NavigationManager
+
 <!-- Menu -->
 
-<div class="row">
-    <div class="col-6">
-        <PizzaList Title="Our Selection of Pizzas" Items="@State.Menu.Pizzas" ButtonTitle="Order" ButtonClass="btn btn-success pl-4 pr-4" Selected="@AddToBasket"></PizzaList>
+@if (State.Menu.Pizzas.Any())
+{
+    <div class="row">
+        <div class="col-6">
+            <PizzaList Title="Our Selection of Pizzas" Items="@State.Menu.Pizzas" ButtonTitle="Order" ButtonClass="btn btn-success pl-4 pr-4" Selected="@AddToBasket" ShowPizzaInformation="@ShowPizzaInformation"></PizzaList>
+        </div>
+        <div class="col-6">
+            <ShoppingBasket Orders="@State.Basket.Orders" GetPizzaFromId="@State.Menu.GetPizza" Selected="@RemoveFromBasket"></ShoppingBasket>
+        </div>
     </div>
-    <div class="col-6">
-        <ShoppingBasket Orders="@State.Basket.Orders" GetPizzaFromId="@State.Menu.GetPizza" Selected="@RemoveFromBasket"></ShoppingBasket>
+
+
+    <CustomerEntry Title="Please enter your details below"
+                   @bind-Customer="@State.Basket.Customer"
+                   ButtonTitle="Checkout"
+                   ButtonClass="mx-auto w-25 btn btn-success"
+                   ValidSubmit="PlaceOrder" />
+}
+else
+{
+    <div class="mx-auto text-center mb-3 mt-3">
+        <div class="spinner-border text-danger" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
     </div>
-</div>
+}
 
 
 
 
-<CustomerEntry Title="Please enter your details below"
-               @bind-Customer="@State.Basket.Customer"
-               ButtonTitle="Checkout"
-               ButtonClass="mx-auto w-25 btn btn-success"
-               ValidSubmit="PlaceOrder" />
 
 
 @State.ToJson()
 
 @code {
-    private State State { get; } = new State();
+    //private State State { get; } = new State();
 
     protected override async Task OnInitializedAsync()
     {
         Menu menu = await MenuService.GetMenuAsync();
 
-        foreach(Pizza pizza in menu.Pizzas)
+        foreach (Pizza pizza in menu.Pizzas)
         {
             State.Menu.Add(pizza);
         }
@@ -61,4 +77,9 @@
     private void RemoveFromBasket(int pos)
     => State.Basket.RemoveAt(pos);
 
+    private void ShowPizzaInformation(Pizza selected)
+    {
+        this.State.Pizza = selected;
+        Task.Run(() => this.NavigationManager.NavigateTo("/pizzainfo"));
+    }
 }

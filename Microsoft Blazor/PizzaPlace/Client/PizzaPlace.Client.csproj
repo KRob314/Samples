@@ -12,7 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PizzaPlace.LazyLoad\PizzaPlace.LazyLoad.csproj" />
     <ProjectReference Include="..\Shared\PizzaPlace.Shared.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<BlazorWebAssemblyLazyLoad Include="PizzaPlace.LazyLoad.dll" />
+	</ItemGroup>
 </Project>

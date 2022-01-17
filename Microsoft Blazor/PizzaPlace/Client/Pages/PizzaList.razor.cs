@@ -21,5 +21,8 @@ namespace PizzaPlace.Client.Pages
         [Parameter]
         public EventCallback<Pizza> Selected { get; set; }
 
+        [Parameter]
+        public Action<Pizza>? ShowPizzaInformation { get; set; }
+
     }
 }

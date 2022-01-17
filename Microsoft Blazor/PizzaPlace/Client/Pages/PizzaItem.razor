@@ -1,6 +1,14 @@
 ﻿<div class="row">
     <div class="col">
-        @Pizza.Name
+        @if (ShowPizzaInformation is not null)
+        {
+            <a href="" @onclick="@(() => ShowPizzaInformation?.Invoke(Pizza))">@Pizza.Name</a>
+        }
+        else
+        {
+            @Pizza.Name
+        }
+
     </div>
     <div class="col text-right">
         @($"{Pizza.Price:0.00}")
